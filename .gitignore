@@ -1,0 +1,34 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Packaging / build artifacts
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Test / tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Generated AgentProof reports
+*-report.html
+
+# demo-app is its own git repo (main/ai-fix fixture history) —
+# tracked independently, not as part of this repo's tree.
+demo-app/
+
+# Editor / OS cruft
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AgentProof Audit Report</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --border: #262a35;
+    --text: #e6e8ec;
+    --muted: #9aa1ae;
+    --critical: #e5484d;
+    --high: #f5793a;
+    --medium: #e8b339;
+    --low: #4c9be8;
+    --approve: #33b16b;
+    --review: #e8b339;
+    --reject: #e5484d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  header h1 {
+    font-size: 28px;
+    margin: 0 0 4px;
+  }
+  header .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .card .label {
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .card .value {
+    font-size: 26px;
+    font-weight: 700;
+  }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .badge-approve { background: rgba(51,177,107,0.15); color: var(--approve); }
+  .badge-review { background: rgba(232,179,57,0.15); color: var(--review); }
+  .badge-reject { background: rgba(229,72,77,0.15); color: var(--reject); }
+
+  .severity-breakdown {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .sev-chip {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+  }
+  .sev-critical { color: var(--critical); }
+  .sev-high { color: var(--high); }
+  .sev-medium { color: var(--medium); }
+  .sev-low { color: var(--low); }
+
+  section h2 {
+    font-size: 18px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-top: 40px;
+  }
+  .finding {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--muted);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .finding.sev-critical-border { border-left-color: var(--critical); }
+  .finding.sev-high-border { border-left-color: var(--high); }
+  .finding.sev-medium-border { border-left-color: var(--medium); }
+  .finding.sev-low-border { border-left-color: var(--low); }
+
+  .finding-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .finding-title {
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .finding-meta {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 6px 0 10px;
+  }
+  .evidence {
+    background: #0b0d11;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin-bottom: 10px;
+  }
+  .recommendation {
+    font-size: 13.5px;
+    color: var(--text);
+  }
+  .recommendation .label {
+    color: var(--muted);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  .empty-state {
+    color: var(--muted);
+    padding: 24px 0;
+  }
+  .changed-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .file-chip {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+  }
+  footer {
+    margin-top: 48px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>AgentProof Audit Report</h1>
+    <div class="subtitle">
+      {{ report.branch }} &rarr; {{ report.base }}
+      {% if report.task %} &middot; task: "{{ report.task }}"{% endif %}
+    </div>
+  </header>
+
+  <div class="summary-grid">
+    <div class="card">
+      <div class="label">Risk Score</div>
+      <div class="value">{{ report.risk_score }} / 100</div>
+    </div>
+    <div class="card">
+      <div class="label">Recommendation</div>
+      <div class="value">
+        <span class="badge badge-{{ report.recommendation.value }}">{{ report.recommendation.value }}</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">Findings</div>
+      <div class="value">{{ findings|length }}</div>
+    </div>
+    <div class="card">
+      <div class="label">Files Changed</div>
+      <div class="value">{{ report.changed_files|length }}</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">Severity Breakdown</div>
+    <div class="severity-breakdown">
+      <span class="sev-chip sev-critical">Critical: {{ counts.critical }}</span>
+      <span class="sev-chip sev-high">High: {{ counts.high }}</span>
+      <span class="sev-chip sev-medium">Medium: {{ counts.medium }}</span>
+      <span class="sev-chip sev-low">Low: {{ counts.low }}</span>
+    </div>
+    <div class="changed-files">
+      {% for file in report.changed_files %}
+      <span class="file-chip">{{ file }}</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  <section>
+    <h2>Findings</h2>
+    {% if findings %}
+      {% for finding in findings %}
+      <div class="finding sev-{{ finding.severity.value }}-border">
+        <div class="finding-header">
+          <div class="finding-title">{{ finding.title }}</div>
+          <span class="badge badge-{{ 'reject' if finding.severity.value in ['critical','high'] else 'review' }}">
+            {{ finding.severity.value }}
+          </span>
+        </div>
+        <div class="finding-meta">
+          {{ finding.rule_id }} &middot; {{ finding.file_path }}{% if finding.line_number %}:{{ finding.line_number }}{% endif %}
+        </div>
+        <div class="evidence">{{ finding.evidence }}</div>
+        <div class="recommendation">
+          <span class="label">Recommendation:</span>{{ finding.recommendation }}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">No findings. This change looks safe to merge.</div>
+    {% endif %}
+  </section>
+
+  <footer>Generated by AgentProof &middot; local-first AI code change auditor</footer>
+</div>
+</body>
+</html>

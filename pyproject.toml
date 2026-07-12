@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentproof"
+version = "0.1.0"
+description = "Local-first CLI that audits AI-generated code changes before merge."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "typer>=0.12.0",
+    "GitPython>=3.1.40",
+    "Jinja2>=3.1.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+agentproof = "agentproof.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["agentproof", "agentproof.*"]
+
+[tool.setuptools.package-data]
+agentproof = ["templates/*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
