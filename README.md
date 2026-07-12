@@ -127,15 +127,21 @@ AgentProof is a local-first, rule-based auditor — it's designed to catch
 common patterns of risky AI-generated changes, not to replace human code
 review.
 
-- **`unrelated_changes` (SCOPE001)** uses simple keyword matching against
-  the task description, not semantic understanding. It can miss genuinely
-  related files whose code doesn't contain the literal task keywords, and
-  can occasionally flag unrelated files that happen to share a substring
-  with a task keyword. Treat its findings as a prompt to double-check, not
-  a definitive verdict.
-- **Secret detection** currently catches Python/JS-style assignments
-  (`api_key = "..."`) but not quoted-key config formats like JSON/YAML
-  (`"api_key": "..."`). Support for these formats is a planned improvement.
+- **`unrelated_changes` (SCOPE001)** uses keyword matching against the task
+  description, not semantic understanding. It can still miss genuinely
+  related files whose code doesn't contain the literal task keywords (or
+  any close variant of them) — that's an inherent limit of keyword
+  matching, not something a regex fix can close. It now compares whole,
+  normalized words instead of raw substrings, so it no longer flags
+  unrelated files that merely share a substring with a keyword (e.g.
+  "tokenizer" vs. "token") and correctly matches simple plurals (e.g.
+  "tokens" vs. "token"). Treat its findings as a prompt to double-check,
+  not a definitive verdict.
+- **Secret detection** catches Python/JS-style assignments
+  (`api_key = "..."`) and quoted-key config formats like JSON/YAML
+  (`"api_key": "..."`). It still won't catch secrets split across
+  multiple lines, built via string concatenation, base64-encoded, or
+  assigned without quotes around the value (e.g. unquoted YAML scalars).
 - **CLI and report-rendering code** (`cli.py`, `report.py`) aren't yet
   covered by the test suite — only the diff parser, rule engine, and
   scoring logic are. The tool's core logic is well-tested; the
@@ -144,7 +150,7 @@ review.
 ## Testing and Hardening
 
 AgentProof was deliberately stress-tested rather than taken at face
-value. Two real bugs surfaced during that process:
+value. Several real bugs surfaced during that process:
 
 1. A packaging bug that caused the HTML report to crash on a normal
    (non-editable) install — only worked in local dev mode.
@@ -152,9 +158,16 @@ value. Two real bugs surfaced during that process:
    were silently invisible to every rule, letting exactly the kind of
    sneaky change this tool exists to catch sail through as a clean
    APPROVE.
+3. `unrelated_changes` (SCOPE001) used raw substring matching, so a
+   keyword like "token" could match inside an unrelated word like
+   "tokenizer" — a false negative, since a file that should have looked
+   unrelated didn't get flagged.
+4. `secrets` (SECRET001) missed quoted-key config formats like JSON
+   (`"api_key": "..."`), only catching Python/JS-style unquoted-key
+   assignments.
 
-Both were caught by running the tool against a real, unrelated repo
-instead of just the bundled demo, and both are now fixed and covered by
-regression tests (36/36 passing). The takeaway: a tool is only as
+All four were caught by running the tool against a real, unrelated repo
+instead of just the bundled demo, and all are now fixed and covered by
+regression tests (42/42 passing). The takeaway: a tool is only as
 trustworthy as the testing behind it, which is why AgentProof's own code
 gets the same scrutiny it applies to yours.
