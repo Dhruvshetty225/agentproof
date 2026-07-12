@@ -28,19 +28,30 @@ _STOPWORDS = {
     "handling",
     "with",
 }
-_WORD_RE = re.compile(r"[a-zA-Z][a-zA-Z0-9_]+")
+# Note: underscores are intentionally NOT part of the word class, so
+# snake_case identifiers like "reset_tokens" split into "reset" and "tokens"
+# rather than being treated as one atomic, unmatchable token.
+_WORD_RE = re.compile(r"[a-zA-Z][a-zA-Z0-9]+")
+
+
+def _normalize(word: str) -> str:
+    """Light singularization so "token" matches "tokens" without matching
+    unrelated words that merely start with the same letters (e.g. "tokenizer").
+    """
+    return word[:-1] if word.endswith("s") and len(word) > 3 else word
 
 
 def _keywords(task: str) -> set[str]:
-    words = {w.lower() for w in _WORD_RE.findall(task)}
+    words = {_normalize(w.lower()) for w in _WORD_RE.findall(task)}
     return {w for w in words if w not in _STOPWORDS and len(w) > 2}
 
 
-def _file_text(file_diff: FileDiff) -> str:
+def _file_words(file_diff: FileDiff) -> set[str]:
     parts = [file_diff.file_path]
     parts.extend(line.content for line in file_diff.added_lines)
     parts.extend(line.content for line in file_diff.deleted_lines)
-    return "\n".join(parts).lower()
+    text = "\n".join(parts)
+    return {_normalize(w.lower()) for w in _WORD_RE.findall(text)}
 
 
 def check(file_diffs: list[FileDiff], task: str | None = None) -> list[Finding]:
@@ -53,8 +64,8 @@ def check(file_diffs: list[FileDiff], task: str | None = None) -> list[Finding]:
 
     findings: list[Finding] = []
     for file_diff in file_diffs:
-        text = _file_text(file_diff)
-        if any(keyword in text for keyword in keywords):
+        words = _file_words(file_diff)
+        if keywords & words:
             continue
 
         findings.append(

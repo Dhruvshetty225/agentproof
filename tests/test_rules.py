@@ -58,6 +58,53 @@ def test_secrets_rule_detects_generic_hardcoded_password():
     assert findings[0].severity == Severity.HIGH
 
 
+def test_secrets_rule_detects_json_style_quoted_key_api_key():
+    file_diffs = [
+        FileDiff(
+            file_path="config/settings.json",
+            added_lines=[ChangedLine(line_number=3, content='  "api_key": "sk-abcd1234efgh"')],
+        )
+    ]
+    findings = secrets.check(file_diffs)
+    assert len(findings) == 1
+    assert findings[0].severity == Severity.CRITICAL
+    assert findings[0].file_path == "config/settings.json"
+
+
+def test_secrets_rule_detects_json_style_quoted_key_password():
+    file_diffs = [
+        FileDiff(
+            file_path="config/settings.json",
+            added_lines=[ChangedLine(line_number=4, content='  "password": "hunter2"')],
+        )
+    ]
+    findings = secrets.check(file_diffs)
+    assert len(findings) == 1
+    assert findings[0].severity == Severity.HIGH
+
+
+def test_secrets_rule_detects_yaml_style_unquoted_key():
+    file_diffs = [
+        FileDiff(
+            file_path="config/settings.yaml",
+            added_lines=[ChangedLine(line_number=2, content='secret: "s3cr3t-value"')],
+        )
+    ]
+    findings = secrets.check(file_diffs)
+    assert len(findings) == 1
+    assert findings[0].severity == Severity.HIGH
+
+
+def test_secrets_rule_ignores_unrelated_quoted_json_fields():
+    file_diffs = [
+        FileDiff(
+            file_path="config/settings.json",
+            added_lines=[ChangedLine(line_number=2, content='  "username": "admin"')],
+        )
+    ]
+    assert secrets.check(file_diffs) == []
+
+
 def test_logging_safety_flags_password_print():
     file_diffs = [
         FileDiff(
@@ -199,6 +246,31 @@ def test_unrelated_changes_flags_utils_py_for_password_reset_task():
 
 def test_unrelated_changes_no_task_means_no_findings():
     assert unrelated_changes.check(_demo_diffs(), task=None) == []
+
+
+def test_unrelated_changes_does_not_false_positive_on_substring_match():
+    # "tokenizer" merely contains "token" as a substring — it should NOT be
+    # treated as related to a task about password reset tokens.
+    file_diffs = [
+        FileDiff(
+            file_path="nlp/tokenizer.py",
+            added_lines=[ChangedLine(line_number=1, content="class Tokenizer: pass")],
+        )
+    ]
+    findings = unrelated_changes.check(file_diffs, task=TASK)
+    assert len(findings) == 1
+    assert findings[0].file_path == "nlp/tokenizer.py"
+
+
+def test_unrelated_changes_matches_plural_form_of_keyword():
+    # "tokens" (plural) should still count as related to keyword "token".
+    file_diffs = [
+        FileDiff(
+            file_path="backend/store.py",
+            added_lines=[ChangedLine(line_number=1, content="reset_tokens = {}")],
+        )
+    ]
+    assert unrelated_changes.check(file_diffs, task=TASK) == []
 
 
 def test_unreviewable_changes_flags_binary_file():

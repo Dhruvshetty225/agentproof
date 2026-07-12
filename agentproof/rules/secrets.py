@@ -10,7 +10,7 @@ from agentproof.schema import Finding, Severity
 RULE_ID = "SECRET001"
 
 _ASSIGNMENT_RE = re.compile(
-    r"(?i)\b(api_key|password|secret|token)\s*[:=]\s*[\"']([^\"']+)[\"']"
+    r"(?i)[\"']?\b(api_key|password|secret|token)\b[\"']?\s*[:=]\s*[\"']([^\"']+)[\"']"
 )
 _FAKE_KEY_RE = re.compile(r"sk-[A-Za-z0-9]{4,}")
 
