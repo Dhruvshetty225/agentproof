@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-16-scope-unrelated-file",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-16-scope-unrelated-file",
+  "title": "Fix typo in signup confirmation email",
+  "description": "'recieve' -> 'receive' in the signup email template.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

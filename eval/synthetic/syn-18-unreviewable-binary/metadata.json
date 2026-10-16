@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-18-unreviewable-binary",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-18-unreviewable-binary",
+  "title": "Update the bundled formatter tool",
+  "description": "New formatter build.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

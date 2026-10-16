@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-05-auth-comment-only",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-05-auth-comment-only",
+  "title": "Remove stale TODO comments from the webhook handler",
+  "description": "Housekeeping only.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

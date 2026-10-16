@@ -1,0 +1,8 @@
+diff --git a/pricing/discount.py b/pricing/discount.py
+index b4af368..6d1c34c 100644
+--- a/pricing/discount.py
++++ b/pricing/discount.py
+@@ -1,2 +1,2 @@
+ def apply(total, rate):
+-    return total * (1 - rate)
++    return round(total * (1 - rate), 2)

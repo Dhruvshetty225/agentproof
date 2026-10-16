@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-10-log-token-fstring",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-10-log-token-fstring",
+  "title": "Add logging to the password reset flow",
+  "description": "Helps support debug reset problems.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

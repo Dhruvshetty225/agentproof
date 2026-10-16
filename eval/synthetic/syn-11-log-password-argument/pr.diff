@@ -1,0 +1,22 @@
+diff --git a/auth/login.py b/auth/login.py
+index 0cad479..082b0eb 100644
+--- a/auth/login.py
++++ b/auth/login.py
+@@ -1,2 +1,5 @@
+ def login(username, password):
+-    return check(username, password)
++    ok = check(username, password)
++    if not ok:
++        logger.debug("login failed %s %s", username, password)
++    return ok
+diff --git a/tests/test_login.py b/tests/test_login.py
+index 587f756..49e876a 100644
+--- a/tests/test_login.py
++++ b/tests/test_login.py
+@@ -1,2 +1,6 @@
+ def test_login():
+     pass
++
++
++def test_failed_login_logged():
++    pass

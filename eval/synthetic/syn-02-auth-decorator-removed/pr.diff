@@ -1,0 +1,24 @@
+diff --git a/accounts/tests/test_views.py b/accounts/tests/test_views.py
+index 5424011..e3f3e3f 100644
+--- a/accounts/tests/test_views.py
++++ b/accounts/tests/test_views.py
+@@ -1,2 +1,6 @@
+ def test_settings_page():
+     pass
++
++
++def test_settings_without_profile():
++    pass
+diff --git a/accounts/views.py b/accounts/views.py
+index 31b8f0b..5f6d4ed 100644
+--- a/accounts/views.py
++++ b/accounts/views.py
+@@ -1,7 +1,6 @@
+ from django.contrib.auth.decorators import login_required
+ 
+ 
+-@login_required
+ def account_settings(request):
+-    profile = request.user.profile
++    profile = getattr(request.user, 'profile', None)
+     return render(request, 'settings.html', {'profile': profile})

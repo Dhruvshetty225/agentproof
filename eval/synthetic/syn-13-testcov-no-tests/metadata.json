@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-13-testcov-no-tests",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-13-testcov-no-tests",
+  "title": "Round discounts to two decimal places",
+  "description": "Totals sometimes showed many decimals.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-20-clean-change",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-20-clean-change",
+  "title": "Add input validation to the signup form",
+  "description": "Reject empty usernames with a clear error.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

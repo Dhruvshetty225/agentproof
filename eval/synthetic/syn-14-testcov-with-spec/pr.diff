@@ -1,0 +1,14 @@
+diff --git a/web/cart.spec.ts b/web/cart.spec.ts
+index f6a62d7..297cb98 100644
+--- a/web/cart.spec.ts
++++ b/web/cart.spec.ts
+@@ -1 +1,2 @@
+ it('renders', () => {});
++it('shows the count', () => {});
+diff --git a/web/cart.ts b/web/cart.ts
+index d24d36a..0b7dfba 100644
+--- a/web/cart.ts
++++ b/web/cart.ts
+@@ -1 +1 @@
+-export const badge = (items: string[]) => '';
++export const badge = (items: string[]) => String(items.length);

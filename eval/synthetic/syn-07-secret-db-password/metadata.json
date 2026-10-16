@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-07-secret-db-password",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-07-secret-db-password",
+  "title": "Connect production settings to the new database",
+  "description": "Point production at the migrated cluster.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

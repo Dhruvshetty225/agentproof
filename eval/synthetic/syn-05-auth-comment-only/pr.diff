@@ -1,0 +1,20 @@
+diff --git a/tests/test_handler.py b/tests/test_handler.py
+index 128262d..3428ee8 100644
+--- a/tests/test_handler.py
++++ b/tests/test_handler.py
+@@ -1,2 +1,6 @@
+ def test_handle():
+     pass
++
++
++def test_handle_unknown():
++    pass
+diff --git a/webhooks/handler.py b/webhooks/handler.py
+index f458c7f..d50a320 100644
+--- a/webhooks/handler.py
++++ b/webhooks/handler.py
+@@ -1,4 +1,2 @@
+ def handle(event):
+-    # TODO: verify token signature here
+-    # TODO: check permission scopes
+     return dispatch(event)

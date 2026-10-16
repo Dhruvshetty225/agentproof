@@ -1,0 +1,4 @@
+diff --git a/app/permissions.py b/app/legacy/permissions_old.py
+similarity index 100%
+rename from app/permissions.py
+rename to app/legacy/permissions_old.py

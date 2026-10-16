@@ -1,0 +1,18 @@
+diff --git a/config/storage.py b/config/storage.py
+index 9272530..eca6f1c 100644
+--- a/config/storage.py
++++ b/config/storage.py
+@@ -1 +1,2 @@
+ BUCKET = 'avatars'
++AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"
+diff --git a/tests/test_storage.py b/tests/test_storage.py
+index 10d5898..76f8172 100644
+--- a/tests/test_storage.py
++++ b/tests/test_storage.py
+@@ -1,2 +1,6 @@
+ def test_bucket():
+     pass
++
++
++def test_upload():
++    pass

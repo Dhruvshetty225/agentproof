@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-14-testcov-with-spec",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-14-testcov-with-spec",
+  "title": "Show item count in the cart badge",
+  "description": "Badge now shows the number of items.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

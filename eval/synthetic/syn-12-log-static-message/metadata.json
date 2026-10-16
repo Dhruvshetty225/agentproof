@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-12-log-static-message",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-12-log-static-message",
+  "title": "Log when password reset emails are sent",
+  "description": "Operational visibility; no user data in the message.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

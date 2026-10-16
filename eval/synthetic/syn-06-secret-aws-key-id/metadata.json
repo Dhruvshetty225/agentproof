@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-06-secret-aws-key-id",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-06-secret-aws-key-id",
+  "title": "Configure S3 uploads",
+  "description": "Upload user avatars to S3.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

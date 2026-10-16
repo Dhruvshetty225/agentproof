@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-01-auth-expiry-removed",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-01-auth-expiry-removed",
+  "title": "Make password reset links work for users in other time zones",
+  "description": "Users abroad report that reset links fail. Simplify validation.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

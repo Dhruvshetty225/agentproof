@@ -28,6 +28,10 @@ htmlcov/
 # terms, not committed)
 tests/schemas/
 
+# Real pull-request data collected by eval/collect.py: third-party code under
+# many licenses, so it stays local. eval/manifest.csv pins it for re-fetching.
+eval/data/
+
 # demo-app is its own git repo (main/ai-fix fixture history) —
 # tracked independently, not as part of this repo's tree.
 demo-app/

@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-02-auth-decorator-removed",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-02-auth-decorator-removed",
+  "title": "Fix 500 error on the account settings page",
+  "description": "The settings view crashed for some users; this fixes the crash.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

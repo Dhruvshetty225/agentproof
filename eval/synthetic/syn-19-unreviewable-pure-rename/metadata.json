@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-19-unreviewable-pure-rename",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-19-unreviewable-pure-rename",
+  "title": "Tidy up the project layout",
+  "description": "Move old modules out of the way.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

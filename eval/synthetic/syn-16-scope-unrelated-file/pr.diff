@@ -1,0 +1,25 @@
+diff --git a/billing/rates.py b/billing/rates.py
+index 33cc68a..378f2cc 100644
+--- a/billing/rates.py
++++ b/billing/rates.py
+@@ -1 +1 @@
+-TAX_RATE = 0.20
++TAX_RATE = 0.15
+diff --git a/templates/signup_email.txt b/templates/signup_email.txt
+index 1908206..206a059 100644
+--- a/templates/signup_email.txt
++++ b/templates/signup_email.txt
+@@ -1 +1 @@
+-You will recieve a confirmation shortly.
++You will receive a confirmation shortly.
+diff --git a/tests/test_rates.py b/tests/test_rates.py
+index 98af0ee..2558fd1 100644
+--- a/tests/test_rates.py
++++ b/tests/test_rates.py
+@@ -1,2 +1,6 @@
+ def test_rate():
+     pass
++
++
++def test_lower_rate():
++    pass

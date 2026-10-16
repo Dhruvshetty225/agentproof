@@ -1,0 +1,108 @@
+{
+  "started_at": "2026-10-16T19:39:02Z",
+  "settings": {
+    "since": "2026-07-01",
+    "until": "2026-09-30",
+    "per_agent": 18,
+    "max_per_repo": 2,
+    "min_stars": 10,
+    "max_changed_files": 50,
+    "max_changed_lines": 1500,
+    "max_diff_bytes": 1000000,
+    "max_search_pages": 10
+  },
+  "agents": {
+    "copilot-swe-agent": {
+      "query": "is:pr is:public is:merged author:app/copilot-swe-agent created:2026-07-01..2026-09-30",
+      "candidates_seen": 132,
+      "already_collected": 12,
+      "collected": 6,
+      "excluded": {
+        "too_many_files": 1,
+        "below_min_stars": 89,
+        "repository_cap_reached": 10,
+        "fork_repository": 13,
+        "too_many_changed_lines": 1
+      }
+    },
+    "devin-ai-integration": {
+      "query": "is:pr is:public is:merged author:app/devin-ai-integration created:2026-07-01..2026-09-30",
+      "candidates_seen": 469,
+      "already_collected": 12,
+      "collected": 6,
+      "excluded": {
+        "too_many_changed_lines": 2,
+        "below_min_stars": 396,
+        "fork_repository": 32,
+        "repository_cap_reached": 19,
+        "archived_repository": 1,
+        "too_many_files": 1
+      }
+    },
+    "google-labs-jules": {
+      "query": "is:pr is:public is:merged author:app/google-labs-jules created:2026-07-01..2026-09-30",
+      "candidates_seen": 1000,
+      "already_collected": 6,
+      "collected": 0,
+      "excluded": {
+        "below_min_stars": 954,
+        "fork_repository": 5,
+        "archived_repository": 15,
+        "repository_cap_reached": 20
+      }
+    },
+    "cursor": {
+      "query": "is:pr is:public is:merged author:app/cursor created:2026-07-01..2026-09-30",
+      "candidates_seen": 68,
+      "already_collected": 12,
+      "collected": 6,
+      "excluded": {
+        "fork_repository": 2,
+        "below_min_stars": 45,
+        "repository_cap_reached": 3
+      }
+    },
+    "claude": {
+      "query": "is:pr is:public is:merged author:app/claude created:2026-07-01..2026-09-30",
+      "candidates_seen": 60,
+      "already_collected": 12,
+      "collected": 6,
+      "excluded": {
+        "below_min_stars": 34,
+        "archived_repository": 2,
+        "repository_cap_reached": 4,
+        "fork_repository": 2
+      }
+    },
+    "amazon-q-developer": {
+      "query": "is:pr is:public is:merged author:app/amazon-q-developer created:2026-07-01..2026-09-30",
+      "candidates_seen": 117,
+      "already_collected": 0,
+      "collected": 0,
+      "excluded": {
+        "below_min_stars": 112,
+        "fork_repository": 5
+      }
+    },
+    "codegen-sh": {
+      "query": "is:pr is:public is:merged author:app/codegen-sh created:2026-07-01..2026-09-30",
+      "candidates_seen": 0,
+      "already_collected": 0,
+      "collected": 0,
+      "excluded": {}
+    }
+  },
+  "duplicates_skipped": 0,
+  "finished_at": "2026-10-16T19:40:49Z",
+  "total_cases": 78,
+  "cases_per_agent": {
+    "devin-ai-integration": 18,
+    "claude": 18,
+    "cursor": 18,
+    "copilot-swe-agent": 18,
+    "google-labs-jules": 6
+  },
+  "repositories": 66,
+  "max_cases_in_one_repository": 2,
+  "rate_limit_waits": 0
+}

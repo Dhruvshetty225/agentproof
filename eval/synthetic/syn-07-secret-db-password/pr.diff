@@ -1,0 +1,20 @@
+diff --git a/settings/production.py b/settings/production.py
+index b7b4885..145f353 100644
+--- a/settings/production.py
++++ b/settings/production.py
+@@ -1,2 +1,2 @@
+-DB_HOST = 'old-db.internal'
+-DB_PASSWORD = os.environ['DB_PASSWORD']
++DB_HOST = 'new-db.internal'
++DB_PASSWORD = "Winter2026!fake"
+diff --git a/tests/test_settings.py b/tests/test_settings.py
+index a67b659..778e035 100644
+--- a/tests/test_settings.py
++++ b/tests/test_settings.py
+@@ -1,2 +1,6 @@
+ def test_host():
+     pass
++
++
++def test_new_host():
++    pass

@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-03-auth-admin-check-removed-js",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-03-auth-admin-check-removed-js",
+  "title": "Fix admin dashboard crash when a user has no profile",
+  "description": "Guard against a missing profile object.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

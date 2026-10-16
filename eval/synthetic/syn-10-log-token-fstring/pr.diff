@@ -1,0 +1,20 @@
+diff --git a/services/reset.py b/services/reset.py
+index 5c443a2..effb2d5 100644
+--- a/services/reset.py
++++ b/services/reset.py
+@@ -1,3 +1,4 @@
+ def issue(user):
+     token = new_token(user)
++    logger.info(f"Issued reset token {token} for {user.email}")
+     send_email(user, token)
+diff --git a/tests/test_reset_service.py b/tests/test_reset_service.py
+index 7c2affa..9ec5920 100644
+--- a/tests/test_reset_service.py
++++ b/tests/test_reset_service.py
+@@ -1,2 +1,6 @@
+ def test_issue():
+     pass
++
++
++def test_issue_logs():
++    pass

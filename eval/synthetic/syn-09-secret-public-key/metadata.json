@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-09-secret-public-key",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-09-secret-public-key",
+  "title": "Add the public key used to verify webhook signatures",
+  "description": "Verification only needs the public half of the key pair.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

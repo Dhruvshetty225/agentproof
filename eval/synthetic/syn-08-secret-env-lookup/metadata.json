@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-08-secret-env-lookup",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-08-secret-env-lookup",
+  "title": "Read the database password from the environment",
+  "description": "Stop hardcoding credentials in settings.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

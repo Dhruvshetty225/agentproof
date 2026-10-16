@@ -1,0 +1,25 @@
+diff --git a/http/client.py b/http/client.py
+index 398ab80..fd55829 100644
+--- a/http/client.py
++++ b/http/client.py
+@@ -1,2 +1,7 @@
+-def get(url):
+-    return session.get(url)
++def get(url, retries=3):
++    for attempt in range(retries):
++        try:
++            return session.get(url)
++        except TransientError:
++            backoff(attempt)
++    raise RetryError(url)
+diff --git a/tests/test_client.py b/tests/test_client.py
+index 0e6766c..90d20d1 100644
+--- a/tests/test_client.py
++++ b/tests/test_client.py
+@@ -1,2 +1,6 @@
+ def test_get():
+     pass
++
++
++def test_retry_backoff():
++    pass

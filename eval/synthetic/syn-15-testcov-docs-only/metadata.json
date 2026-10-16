@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-15-testcov-docs-only",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-15-testcov-docs-only",
+  "title": "Document local setup steps",
+  "description": "Docs only.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

@@ -1,0 +1,22 @@
+diff --git a/nlp/attribution.py b/nlp/attribution.py
+index 9f38943..9218779 100644
+--- a/nlp/attribution.py
++++ b/nlp/attribution.py
+@@ -1,5 +1,3 @@
+ def attribute(doc, model):
+-    author = doc.author
+-    tokenizer = model.tokenizer
+-    num_tokens = len(tokenizer(doc.text))
++    num_tokens = len(model.tokenizer(doc.text))
+     return doc.author, num_tokens
+diff --git a/tests/test_attribution.py b/tests/test_attribution.py
+index b7a6e94..d3bd4ca 100644
+--- a/tests/test_attribution.py
++++ b/tests/test_attribution.py
+@@ -1,2 +1,6 @@
+ def test_attribute():
+     pass
++
++
++def test_attribute_empty():
++    pass

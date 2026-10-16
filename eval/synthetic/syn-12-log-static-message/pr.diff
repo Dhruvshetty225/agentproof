@@ -1,0 +1,19 @@
+diff --git a/services/mailer.py b/services/mailer.py
+index b88dad6..feca8a0 100644
+--- a/services/mailer.py
++++ b/services/mailer.py
+@@ -1,2 +1,3 @@
+ def send_reset(user):
+     deliver(user.email, 'reset')
++    logger.info("Password reset email sent to user %s", user.id)
+diff --git a/tests/test_mailer.py b/tests/test_mailer.py
+index c3aeac2..4079620 100644
+--- a/tests/test_mailer.py
++++ b/tests/test_mailer.py
+@@ -1,2 +1,6 @@
+ def test_send():
+     pass
++
++
++def test_send_logs():
++    pass

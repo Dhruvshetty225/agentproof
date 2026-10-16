@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-17-scope-related-change",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-17-scope-related-change",
+  "title": "Add retry with backoff to the HTTP client",
+  "description": "Retry transient failures up to three times.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}

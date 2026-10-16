@@ -1,0 +1,9 @@
+{
+  "case_id": "syn-11-log-password-argument",
+  "kind": "synthetic",
+  "source_url": "synthetic:syn-11-log-password-argument",
+  "title": "Log failed login attempts",
+  "description": "Security asked for visibility into failed logins.",
+  "diff_file": "pr.diff",
+  "note": "Hand-written synthetic case; not a real pull request."
+}
