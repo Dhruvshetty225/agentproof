@@ -2,9 +2,12 @@
 
 Schema validation uses the official OASIS schema, which is not committed
 (see scripts/fetch_sarif_schema.sh). If it has not been downloaded, the
-validation tests are reported as SKIPPED, not as passed.
+validation tests are reported as SKIPPED, not as passed. If the cached copy
+does not match the pinned checksum, they ERROR instead of validating against
+an unknown schema.
 """
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -14,7 +17,11 @@ from agentproof.rules import ALL_RULES
 from agentproof.sarif import render_sarif
 from agentproof.schema import AuditReport, DiffSide, Finding, MergeRecommendation, Severity
 
-SCHEMA_PATH = Path(__file__).resolve().parent / "schemas" / "sarif-schema-2.1.0.json"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+SCHEMA_PATH = ROOT_DIR / "tests" / "schemas" / "sarif-schema-2.1.0.json"
+FETCH_SCRIPT = ROOT_DIR / "scripts" / "fetch_sarif_schema.sh"
+# Must equal EXPECTED_SHA256 in scripts/fetch_sarif_schema.sh (checked below).
+SCHEMA_SHA256 = "c3b4bb2d6093897483348925aaa73af03b3e3f4bd4ca38cef26dcb4212a2682e"
 FAKE_KEY = "sk-" + "abcd1234efgh"
 
 
@@ -60,6 +67,23 @@ def _results(*findings) -> list:
 # --- schema validation -------------------------------------------------------------------
 
 
+def _load_verified_schema(path: Path) -> dict:
+    """Load the cached schema, failing loudly unless it is the pinned version.
+
+    The fetch script checks the checksum when it downloads the file; this
+    checks it again every time the tests use the cached copy, so an edited or
+    corrupted cache can never be used for validation.
+    """
+    actual = hashlib.sha256(path.read_bytes()).hexdigest()
+    if actual != SCHEMA_SHA256:
+        pytest.fail(
+            f"Cached SARIF schema {path} does not match the pinned checksum "
+            f"(expected {SCHEMA_SHA256}, got {actual}). Re-run "
+            "scripts/fetch_sarif_schema.sh. SARIF schema validation was NOT performed."
+        )
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 @pytest.fixture(scope="module")
 def sarif_validator():
     jsonschema = pytest.importorskip("jsonschema")
@@ -68,8 +92,20 @@ def sarif_validator():
             "SARIF schema not downloaded; run scripts/fetch_sarif_schema.sh. "
             "SARIF schema validation was NOT performed."
         )
-    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
-    return jsonschema.Draft4Validator(schema)
+    return jsonschema.Draft4Validator(_load_verified_schema(SCHEMA_PATH))
+
+
+def test_pinned_checksum_matches_the_fetch_script():
+    script = FETCH_SCRIPT.read_text(encoding="utf-8")
+    assert f'EXPECTED_SHA256="{SCHEMA_SHA256}"' in script
+
+
+def test_tampered_schema_cache_fails_instead_of_validating(tmp_path):
+    # A permissive schema that would accept any document: the dangerous case.
+    tampered = tmp_path / "sarif-schema-2.1.0.json"
+    tampered.write_text('{"type": "object"}', encoding="utf-8")
+    with pytest.raises(pytest.fail.Exception, match="validation was NOT performed"):
+        _load_verified_schema(tampered)
 
 
 @pytest.mark.parametrize(

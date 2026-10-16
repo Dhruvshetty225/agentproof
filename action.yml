@@ -10,6 +10,8 @@
 # * Use it from `pull_request` workflows, not `pull_request_target`.
 # * The caller must check out with full history (fetch-depth: 0) so the merge
 #   base of base and head can be found.
+# * Leave the `config` input empty when auditing untrusted changes. A path
+#   inside the checked-out pull request is controlled by that pull request.
 name: AgentProof
 description: Audit the changes in a pull request for risky AI-generated edits using deterministic rules.
 
@@ -35,7 +37,10 @@ inputs:
     required: false
     default: agentproof.sarif
   config:
-    description: Optional path to a config file. Empty uses .agentproof.toml from the base commit.
+    description: >-
+      Optional path to a config file. Empty (recommended) uses .agentproof.toml from
+      the base commit. A path inside the checked-out pull request is controlled by
+      that pull request, which could then loosen its own audit.
     required: false
     default: ""
   fail-on-reject:

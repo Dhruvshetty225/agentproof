@@ -195,9 +195,15 @@ Inputs: `base`/`head` (default: the pull request's base and head commits),
 How it handles the security-sensitive parts:
 
 - **No untrusted code runs.** AgentProof is installed from the action's own
-  source, not from the pull request, and only reads git data. Configuration
-  comes from the base commit. Use the action by a pinned commit of this
-  repository, not `uses: ./` from the repository being audited.
+  source, not from the pull request, and only reads git data. Use the
+  action by a pinned commit of this repository, not `uses: ./` from the
+  repository being audited.
+- **Leave `config` empty for untrusted pull requests.** By default the
+  configuration is `.agentproof.toml` on the base commit, which the pull
+  request cannot change. If `config` points at a file inside the checked-out
+  repository, that file comes from the pull request itself, so the pull
+  request could disable rules or raise the thresholds to pass its own
+  audit. Only set `config` to a file the pull request cannot modify.
 - **`pull_request`, never `pull_request_target`.** On `pull_request`, fork
   pull requests run with a read-only token and no secrets.
 - **No shell injection from pull request text.** Inputs such as the pull
