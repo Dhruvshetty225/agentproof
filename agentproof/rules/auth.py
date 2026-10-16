@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from agentproof.diff_parser import FileDiff
 from agentproof.identifiers import contains_phrase, identifier_words, identifiers_in
-from agentproof.schema import Finding, Severity
+from agentproof.schema import DiffSide, Finding, Severity
 
 RULE_ID = "AUTH001"
 
@@ -85,6 +85,7 @@ def check(file_diffs: list[FileDiff], task: str | None = None) -> list[Finding]:
                         file_path=file_diff.file_path,
                         line_number=line.line_number,
                         evidence=line.content.strip(),
+                        side=DiffSide.OLD,
                         recommendation=(
                             "Confirm this deletion is intentional. Removing auth, "
                             "verification, permission, or token-expiry checks can "

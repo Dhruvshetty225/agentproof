@@ -64,19 +64,90 @@ is `reject`, so it can be wired into CI.
 
 ## Expected audit output
 
-Auditing `ai-fix` against `main` should surface five findings and a risk
-score of 90/100 (capped at 100), recommending **REJECT**:
+Auditing `ai-fix` against `main` should surface four findings and a risk
+score of 70/100, recommending **REJECT**:
 
-| Severity | Rule       | File               | Issue                                             |
-|----------|------------|--------------------|----------------------------------------------------|
-| CRITICAL | SECRET001  | backend/utils.py   | Hardcoded `api_key = "sk-1234secret"`              |
-| HIGH     | AUTH001    | backend/auth.py    | Deleted `if is_expired(token): raise ValueError(...)` |
-| HIGH     | AUTH001    | backend/auth.py    | (second deleted line of the same check)            |
-| MEDIUM   | TESTCOV001 | (both files)       | Production code changed, no test file changed      |
-| MEDIUM   | SCOPE001   | backend/utils.py   | Change unrelated to the stated task                 |
+| Severity | Rule       | Location                | Issue                                                   |
+|----------|------------|-------------------------|---------------------------------------------------------|
+| CRITICAL | SECRET001  | backend/utils.py:7      | Hardcoded key, shown redacted as `api_key = "sk-1****"` |
+| HIGH     | AUTH001    | backend/auth.py:57-58   | Deleted `if is_expired(token): raise ValueError(...)`   |
+| MEDIUM   | TESTCOV001 | (both files)            | Production code changed, no test file changed           |
+| MEDIUM   | SCOPE001   | backend/utils.py        | Change unrelated to the stated task                     |
+
+The two deleted lines of the expiry check are one removed `if` block, so
+they are reported and scored as one AUTH001 finding (see "Finding
+grouping" below).
 
 Auditing `main` against itself (or a genuinely safe branch) produces no
 findings and a risk score of 0, recommending **APPROVE**.
+
+## Configuration
+
+AgentProof works without any configuration. To change its behavior, add an
+optional `.agentproof.toml`:
+
+```toml
+[rules]
+disable = ["SCOPE001"]        # rules that do not run at all
+
+[severity]
+TESTCOV001 = "low"            # low | medium | high | critical
+
+[thresholds]
+review = 40                   # score >= review -> REVIEW
+reject = 70                   # score >= reject -> REJECT
+```
+
+Every section and key is optional. Which file is used (the first match
+wins; files are never merged):
+
+1. `--config PATH` on the command line.
+2. `.agentproof.toml` at the root of the **base** branch, read through git.
+   It is read from the base, not from the branch being audited, so a change
+   cannot relax its own audit by editing the file.
+3. Built-in defaults: all rules on, built-in severities, review at 30,
+   reject at 60.
+
+Unknown sections or keys, unknown rule IDs, invalid severities, and
+thresholds that are not whole numbers from 1 to 100 with review below
+reject are reported as a configuration error (exit code 2) instead of being
+ignored. The report shows which configuration was used.
+
+## Ignoring a specific finding
+
+Add `agentproof: ignore[RULE_ID]` to a line, usually in a comment:
+
+```python
+DEFAULT_TOKEN = "placeholder"  # agentproof: ignore[SECRET001]
+```
+
+- Several rules can be listed: `agentproof: ignore[AUTH001, LOG001]`.
+- A directive only applies to findings on the same line. For an added
+  line, it must be on that added line. For a deleted line, it must be on
+  the deleted line itself, which means it was already in the base version:
+  a change cannot silence a finding about code it deletes.
+- Findings without a line (TESTCOV001, SCOPE001, UNREVIEWABLE001) cannot be
+  ignored inline; disable the rule in `.agentproof.toml` instead.
+- Malformed directives (`ignore`, `ignore[]`, lowercase IDs, trailing
+  commas) have no effect.
+- Ignored findings are not scored, but the report still lists them.
+
+## Secret redaction
+
+Terminal and HTML reports never show a full detected secret. A value keeps
+its first four characters followed by `****` (`sk-1234secret` ->
+`sk-1****`); values of four characters or fewer become `****`. The body of
+a PEM private key is always replaced with `****`. A secret found on one line
+is also masked wherever the same value appears in another finding.
+
+## Finding grouping
+
+When a whole block is deleted, AUTH001 would otherwise flag every line of
+it. Deleted-line findings from the same rule and file are merged when they
+belong to one removed statement: a flagged line plus the contiguous deleted
+lines indented deeper than it (its body or continuation lines). A line at
+the same or shallower indentation starts a new statement, so two adjacent
+but independent checks are still reported and scored separately.
 
 ## Project architecture
 
@@ -87,8 +158,13 @@ agentproof/
                    per-file added/deleted lines with line numbers
   schema.py    Finding / AuditReport dataclasses, Severity and
                MergeRecommendation enums
-  engine.py    Runs all rules, deduplicates findings, scores risk,
-               and produces the final AuditReport
+  engine.py    Runs all rules, deduplicates findings, applies ignores,
+               grouping and config, scores risk, and produces the
+               final AuditReport
+  config.py    Loads and validates the optional .agentproof.toml
+  ignores.py   Inline "agentproof: ignore[RULE_ID]" directives
+  grouping.py  Merges findings from one deleted block
+  redaction.py Masks secrets before any report is displayed or written
   report.py    Renders an AuditReport to HTML via Jinja2
   identifiers.py  Splits snake_case/camelCase names into words so rules
                   match whole words instead of raw substrings
@@ -111,14 +187,13 @@ tests/         pytest suite covering the diff parser, each rule, and the
 ```
 
 **Risk scoring** (`agentproof/engine.py`): critical = 30, high = 20,
-medium = 10, low = 5 points per finding, summed and capped at 100.
-0–29 → approve, 30–59 → review, 60–100 → reject.
+medium = 10, low = 5 points per finding (after grouping), summed and
+capped at 100. By default 0–29 → approve, 30–59 → review, 60–100 → reject;
+the thresholds can be changed in `.agentproof.toml`.
 
 ## Future roadmap
 
 - Support additional languages beyond Python (JS/TS, Go) in the rule set.
-- Pluggable rule configuration (enable/disable rules, custom severity
-  thresholds via a config file).
 - GitHub Action / pre-merge CI integration that posts the report as a PR
   comment.
 - Richer `unrelated_changes` scoping using commit message / PR description
@@ -172,10 +247,17 @@ review.
   changed test file suppresses the warning, even an unrelated test or a
   test file that was deleted. `*.test.jsx`/`*.test.tsx` names are not
   recognized.
-- **CLI and report-rendering code** (`cli.py`, `report.py`) aren't yet
-  covered by the test suite — only the diff parser, rule engine, and
-  scoring logic are. The tool's core logic is well-tested; the
-  presentation layer isn't yet.
+- **CLI and report-rendering code** (`cli.py`, `report.py`) only have
+  tests for secret redaction and configuration errors so far; argument
+  handling, exit codes and output files are not yet covered.
+- **Redaction** can only hide values that SECRET001 recognizes. A secret
+  it does not detect is shown as-is. To stay on the safe side, a detected
+  value is masked everywhere it appears as a whole word, so a very short
+  or common value (e.g. `token = "abc"`) can also mask unrelated text.
+- **Grouping** relies on indentation, so it assumes consistent
+  indentation within a deleted block and only applies to deleted lines.
+- **Ignore directives** are plain text: AgentProof does not check that a
+  directive is inside a comment.
 
 ## Testing and Hardening
 

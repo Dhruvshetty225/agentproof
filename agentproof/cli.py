@@ -6,10 +6,13 @@ from typing import Optional
 
 import typer
 from rich.console import Console
+from rich.markup import escape
 from rich.panel import Panel
 from rich.table import Table
 
+from agentproof.config import ConfigError, load_config
 from agentproof.engine import run_audit
+from agentproof.redaction import redact_report
 from agentproof.report import write_html_report
 from agentproof.schema import AuditReport, MergeRecommendation, Severity
 
@@ -46,9 +49,20 @@ def audit(
     output: str = typer.Option(
         "agentproof-report.html", "--output", help="Path to write the HTML report."
     ),
+    config_path: Optional[str] = typer.Option(
+        None,
+        "--config",
+        help="Path to a .agentproof.toml file. Default: .agentproof.toml on the base branch.",
+    ),
 ) -> None:
     """Audit the diff between BASE and BRANCH in REPO and generate a risk report."""
-    report = run_audit(repo_path=repo, base=base, branch=branch, task=task)
+    try:
+        config = load_config(repo, base, config_path)
+    except ConfigError as exc:
+        console.print(f"[bold red]Configuration error:[/bold red] {escape(str(exc))}")
+        raise typer.Exit(code=2)
+
+    report = run_audit(repo_path=repo, base=base, branch=branch, task=task, config=config)
 
     _print_terminal_report(report)
 
@@ -68,11 +82,14 @@ def version() -> None:
 
 
 def _print_terminal_report(report: AuditReport) -> None:
+    # Text that comes from the repository (evidence, paths, task) is passed
+    # through escape() so Rich does not treat "[...]" in code as markup.
+    report = redact_report(report)
     console.print()
     console.print(
         Panel.fit(
-            f"[bold]{report.branch}[/bold] -> [bold]{report.base}[/bold]"
-            + (f"\ntask: \"{report.task}\"" if report.task else ""),
+            f"[bold]{escape(report.branch)}[/bold] -> [bold]{escape(report.base)}[/bold]"
+            + (f"\ntask: \"{escape(report.task)}\"" if report.task else ""),
             title="AgentProof Audit",
             border_style="cyan",
         )
@@ -93,7 +110,15 @@ def _print_terminal_report(report: AuditReport) -> None:
         f"[blue]low={counts['low']}[/blue])"
     )
 
-    console.print(f"Changed files: {', '.join(report.changed_files) or '(none)'}\n")
+    console.print(f"Changed files: {escape(', '.join(report.changed_files)) or '(none)'}")
+    console.print(f"Config: {escape(report.config_source)}")
+    if report.ignored_findings:
+        ignored = ", ".join(f"{f.rule_id} at {f.location}" for f in report.ignored_findings)
+        console.print(
+            f"Ignored by inline directives ({len(report.ignored_findings)}): "
+            f"{escape(ignored)}"
+        )
+    console.print()
 
     if not report.findings:
         console.print("[bold green]No findings. This change looks safe to merge.[/bold green]")
@@ -110,16 +135,13 @@ def _print_terminal_report(report: AuditReport) -> None:
     sorted_findings = sorted(report.findings, key=lambda f: _SEVERITY_ORDER.index(f.severity))
     for finding in sorted_findings:
         style = _SEVERITY_STYLE[finding.severity]
-        location = finding.file_path
-        if finding.line_number:
-            location += f":{finding.line_number}"
         table.add_row(
             f"[{style}]{finding.severity.value.upper()}[/{style}]",
             finding.rule_id,
-            location,
-            finding.title,
-            finding.evidence,
-            finding.recommendation,
+            escape(finding.location),
+            escape(finding.title),
+            escape(finding.evidence),
+            escape(finding.recommendation),
         )
 
     console.print(table)

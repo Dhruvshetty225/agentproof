@@ -21,7 +21,7 @@ import re
 
 from agentproof.diff_parser import FileDiff
 from agentproof.identifiers import ends_with_phrase, identifier_words, identifiers_in
-from agentproof.schema import Finding, Severity
+from agentproof.schema import DiffSide, Finding, Severity
 
 RULE_ID = "LOG001"
 
@@ -170,6 +170,7 @@ def check(file_diffs: list[FileDiff], task: str | None = None) -> list[Finding]:
                     file_path=file_diff.file_path,
                     line_number=line.line_number,
                     evidence=content.strip(),
+                    side=DiffSide.NEW,
                     recommendation=(
                         f"Avoid logging or printing '{name}' directly. Redact or "
                         "omit sensitive fields before writing to logs or stdout."
