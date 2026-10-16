@@ -1,0 +1,64 @@
+# Example workflow for another repository: audit every pull request with AgentProof.
+#
+# Copy this file to .github/workflows/agentproof.yml in the repository you want
+# to audit. It lives in examples/ here so it never runs in this repository.
+#
+# Before using it:
+# * Replace <commit-sha> with a reviewed commit of the AgentProof repository.
+#   Pinning a full commit SHA means a later change to AgentProof cannot
+#   silently change what runs in your CI.
+# * Running it uses GitHub Actions minutes. Standard GitHub-hosted runners are
+#   free for public repositories; private repositories use the plan's monthly
+#   included minutes and artifact storage (see the README).
+# * The optional code scanning upload needs code scanning to be available for
+#   the repository (private repositories need GitHub Code Security or GitHub
+#   Advanced Security). Delete that step if you do not have it.
+name: AgentProof
+
+on:
+  # pull_request (not pull_request_target): fork pull requests run with a
+  # read-only token and no secrets, which is what an audit of untrusted
+  # changes should have.
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # only for the optional code scanning upload
+    steps:
+      - name: Check out with full history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # AgentProof needs the merge base of base and head
+          persist-credentials: false # the audit never pushes
+
+      - name: Run AgentProof
+        id: agentproof
+        uses: Dhruvshetty225/agentproof@<commit-sha>
+        with:
+          task: ${{ github.event.pull_request.title }}
+          format: sarif
+          output: agentproof.sarif
+          fail-on-reject: "true"
+
+      - name: Upload the report as a workflow artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: agentproof-report
+          path: agentproof.sarif
+          if-no-files-found: warn
+
+      - name: Upload SARIF to code scanning (optional)
+        # Fork pull requests get a read-only token, so this upload would fail.
+        if: ${{ !cancelled() && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: agentproof.sarif
+          category: agentproof

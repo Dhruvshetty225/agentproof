@@ -61,6 +61,7 @@ def check(file_diffs: list[FileDiff], task: str | None = None) -> list[Finding]:
             file_path=file_list,
             line_number=None,
             evidence=f"Changed production files with no test changes: {file_list}",
+            paths=tuple(f.file_path for f in production_files),
             recommendation=(
                 "Add or update tests that cover this change before merging, "
                 "especially for behavior changes made by an AI agent."

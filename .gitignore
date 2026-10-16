@@ -24,6 +24,10 @@ htmlcov/
 # Generated AgentProof reports
 *-report.html
 
+# Official SARIF schema, downloaded by scripts/fetch_sarif_schema.sh (OASIS
+# terms, not committed)
+tests/schemas/
+
 # demo-app is its own git repo (main/ai-fix fixture history) —
 # tracked independently, not as part of this repo's tree.
 demo-app/

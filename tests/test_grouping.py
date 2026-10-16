@@ -110,7 +110,7 @@ def test_same_block_findings_merge_into_one_with_a_line_range():
     assert len(merged) == 1
     assert merged[0].line_number == 57
     assert merged[0].end_line_number == 58
-    assert merged[0].location == "backend/auth.py:57-58"
+    assert merged[0].location == "backend/auth.py:57-58 (deleted, base line numbers)"
     assert merged[0].evidence == "line 57\nline 58"
 
 
@@ -169,7 +169,7 @@ def test_deleted_if_block_is_scored_once():
     findings, _ignored = collect_findings([file_diff])
     auth_findings = [f for f in findings if f.rule_id == "AUTH001"]
     assert len(auth_findings) == 1
-    assert auth_findings[0].location == "backend/auth.py:57-58"
+    assert auth_findings[0].location == "backend/auth.py:57-58 (deleted, base line numbers)"
     assert calculate_risk_score(auth_findings) == 20
 
 

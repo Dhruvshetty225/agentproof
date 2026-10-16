@@ -48,18 +48,34 @@ class Finding:
     side: DiffSide | None = None
     # Set when several lines were merged into one finding (see grouping.py).
     end_line_number: int | None = None
+    # Every file the finding is about, when that is more than one file
+    # (TESTCOV001 lists several production files in file_path for display).
+    paths: tuple[str, ...] = ()
 
     def dedupe_key(self) -> tuple:
         return (self.rule_id, self.file_path, self.line_number, self.evidence)
 
     @property
-    def location(self) -> str:
-        """Display form: path, path:line, or path:first-last for merged lines."""
+    def lines(self) -> str | None:
+        """Line text such as 7 or 57-58; None for findings without a line."""
         if self.line_number is None:
-            return self.file_path
+            return None
         if self.end_line_number is not None and self.end_line_number != self.line_number:
-            return f"{self.file_path}:{self.line_number}-{self.end_line_number}"
-        return f"{self.file_path}:{self.line_number}"
+            return f"{self.line_number}-{self.end_line_number}"
+        return str(self.line_number)
+
+    @property
+    def location(self) -> str:
+        """Display form such as "a.py", "a.py:7" or "a.py:57-58 (deleted, base line numbers)".
+
+        Deleted lines are numbered as in the base version, so they are labelled
+        to avoid presenting them as lines of the current file.
+        """
+        if self.lines is None:
+            return self.file_path
+        if self.side is DiffSide.OLD:
+            return f"{self.file_path}:{self.lines} (deleted, base line numbers)"
+        return f"{self.file_path}:{self.lines}"
 
 
 @dataclass

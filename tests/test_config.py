@@ -212,9 +212,7 @@ def test_thresholds_change_the_recommendation(tmp_path):
 # --- command line ------------------------------------------------------------------
 
 
-def test_cli_reports_config_errors_with_exit_code_2(tmp_path, monkeypatch):
-    output = io.StringIO()
-    monkeypatch.setattr(cli, "console", Console(file=output, width=400, no_color=True))
+def test_cli_reports_config_errors_with_exit_code_2(tmp_path):
     repo = make_repo(
         tmp_path / "repo",
         {".agentproof.toml": '[rules]\ndisable = ["AUTH999"]\n'},
@@ -225,8 +223,10 @@ def test_cli_reports_config_errors_with_exit_code_2(tmp_path, monkeypatch):
         ["audit", "--repo", repo, "--branch", "feature", "--output", str(tmp_path / "r.html")],
     )
     assert result.exit_code == 2
-    # "[rules]" must be printed literally, not swallowed as Rich markup.
-    assert "Configuration error: .agentproof.toml on main [rules] disable" in output.getvalue()
+    # Errors go to standard error, and "[rules]" is printed literally rather
+    # than being swallowed as Rich markup.
+    assert "Configuration error: .agentproof.toml on main [rules] disable" in result.stderr
+    assert result.stdout == ""
     assert not (tmp_path / "r.html").exists()
 
 
@@ -237,11 +237,7 @@ def test_cli_uses_the_explicit_config_and_shows_its_source(tmp_path, monkeypatch
     explicit = tmp_path / "custom.toml"
     explicit.write_text('[rules]\ndisable = ["TESTCOV001"]\n', encoding="utf-8")
     result = CliRunner().invoke(
-        cli.app,
-        [
-            "audit", "--repo", repo, "--branch", "feature",
-            "--config", str(explicit), "--output", str(tmp_path / "r.html"),
-        ],
+        cli.app, ["audit", "--repo", repo, "--branch", "feature", "--config", str(explicit)]
     )
     assert result.exit_code == 0
     assert f"Config: {explicit}" in output.getvalue()

@@ -42,8 +42,14 @@ entry point defined in `pyproject.toml`.
 
 ## Running the demo
 
-The repo ships with `demo-app/`, a tiny two-branch Git repository used to
-exercise every rule:
+`demo-app/` is a tiny two-branch Git repository used to exercise the
+rules. It is not committed; build it with:
+
+```bash
+bash scripts/setup_demo_app.sh
+```
+
+It contains:
 
 - `main` — a safe password-reset implementation. Reset tokens are validated
   and expired tokens are correctly rejected (see `demo-app/tests/test_auth.py`).
@@ -58,9 +64,14 @@ agentproof audit --repo ./demo-app --base main --branch ai-fix \
   --task "Fix password reset token handling"
 ```
 
-This prints a terminal report and writes `agentproof-report.html` in the
-current directory. The command exits with status `1` when the recommendation
-is `reject`, so it can be wired into CI.
+This prints a terminal report. The command exits with status `1` when the
+recommendation is `reject`, so it can be wired into CI. See "Output
+formats" for HTML, JSON and SARIF.
+
+AgentProof audits the changes `--branch` made since it diverged from
+`--base` (git's three-dot diff, `base...branch`), the same view as a pull
+request's "Files changed" tab. Commits added to the base afterwards are not
+reported as changes made by the branch.
 
 ## Expected audit output
 
@@ -80,6 +91,139 @@ grouping" below).
 
 Auditing `main` against itself (or a genuinely safe branch) produces no
 findings and a risk score of 0, recommending **APPROVE**.
+
+## Output formats
+
+```bash
+agentproof audit --repo . --base main --branch feature                       # terminal (default)
+agentproof audit --repo . --base main --branch feature --format json > report.json
+agentproof audit --repo . --base main --branch feature --output report.html  # format from extension
+agentproof audit --repo . --base main --branch feature --format sarif --output agentproof.sarif
+```
+
+- `--format` is `terminal` (default), `html`, `json` or `sarif`. If it is
+  omitted and `--output` ends in `.html`/`.htm`, `.json` or `.sarif`, the
+  format is taken from the extension; any other extension means terminal.
+- The report goes to standard output unless `--output PATH` is given.
+- Status messages ("report written to ...") and errors always go to
+  standard error, so standard output contains only the report and
+  `--format json` output can be piped straight into other tools.
+- Every format applies the same secret redaction.
+
+Exit codes: `0` approve or review, `1` reject, `2` usage, configuration,
+git or file-writing errors.
+
+**Change from earlier versions:** the CLI used to print the terminal report
+*and* always write `agentproof-report.html` (or the `--output` path) as
+HTML. It now produces one report per run. `--output report.html` still
+produces HTML because the format is inferred from the extension, but
+running without `--output` no longer creates an HTML file.
+
+**Line numbers.** Added lines are numbered as in the audited branch.
+Deleted lines can only be numbered as in the base version, so they are
+labelled, for example `backend/auth.py:57-58 (deleted, base line numbers)`.
+JSON gives each finding a `side` (`"new"`, `"old"` or `null` for
+whole-file findings) plus `line_number`/`end_line_number`.
+
+**SARIF 2.1.0.** Severities map to SARIF levels (critical/high → `error`,
+medium → `warning`, low → `note`; the original severity is kept in
+`properties.severity`). Paths are repository-relative. Deleted-line
+findings point at the file without a line region, because their line
+numbers belong to the base version, not the current file; the base line
+numbers are stated in the message and in `properties.baseStartLine` /
+`baseEndLine`. Findings silenced by an ignore directive are included with
+an `inSource` suppression. The output is validated in the test suite
+against the official OASIS SARIF 2.1.0 schema (see "Running the tests").
+
+## GitHub Action
+
+This repository is also a reusable GitHub Action (`action.yml`). The short
+form of the step is:
+
+```yaml
+- uses: Dhruvshetty225/agentproof@<commit-sha>
+  with:
+    task: ${{ github.event.pull_request.title }}
+```
+
+That step alone is not a working workflow. It also needs a `pull_request`
+trigger, a checkout with full history, permissions, and steps to upload the
+report. A complete workflow is in
+[`examples/agentproof-pull-request.yml`](examples/agentproof-pull-request.yml):
+
+```yaml
+name: AgentProof
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # only for the optional code scanning upload
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0              # needed to find the merge base
+          persist-credentials: false  # the audit never pushes
+      - id: agentproof
+        uses: Dhruvshetty225/agentproof@<commit-sha>
+        with:
+          task: ${{ github.event.pull_request.title }}
+          format: sarif
+          output: agentproof.sarif
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: agentproof-report
+          path: agentproof.sarif
+      - if: ${{ !cancelled() && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: agentproof.sarif
+          category: agentproof
+```
+
+Inputs: `base`/`head` (default: the pull request's base and head commits),
+`task`, `format` (default `sarif`), `output` (default `agentproof.sarif`),
+`config`, `fail-on-reject` (default `true`), `python-version`. Outputs:
+`exit-code` and `report`.
+
+How it handles the security-sensitive parts:
+
+- **No untrusted code runs.** AgentProof is installed from the action's own
+  source, not from the pull request, and only reads git data. Configuration
+  comes from the base commit. Use the action by a pinned commit of this
+  repository, not `uses: ./` from the repository being audited.
+- **`pull_request`, never `pull_request_target`.** On `pull_request`, fork
+  pull requests run with a read-only token and no secrets.
+- **No shell injection from pull request text.** Inputs such as the pull
+  request title are passed to the shell only through environment
+  variables.
+- **History:** `fetch-depth: 0` is required; with a shallow checkout the
+  merge base cannot be found and the action fails with exit code 2.
+- **Report upload:** the artifact upload works for every repository. The
+  code scanning upload is optional and skipped for fork pull requests,
+  whose token cannot write security events.
+
+Account-dependent limits (from GitHub's documentation; check the current
+billing pages before relying on them):
+
+- GitHub Actions is free for public repositories on standard GitHub-hosted
+  runners. Private repositories use the plan's monthly included minutes
+  and artifact storage (for example 2,000 minutes and 500 MB on GitHub
+  Free); what happens beyond that depends on your account's billing
+  settings.
+- Uploading SARIF to code scanning in a private repository requires GitHub
+  Code Security or GitHub Advanced Security, which are paid products. Drop
+  that step if you don't have them; the artifact upload still works.
+
+Nothing here runs automatically in this repository: the example lives in
+`examples/`, not `.github/workflows/`, and the action has not been run on
+GitHub-hosted runners as part of this work.
 
 ## Configuration
 
@@ -194,11 +338,9 @@ the thresholds can be changed in `.agentproof.toml`.
 ## Future roadmap
 
 - Support additional languages beyond Python (JS/TS, Go) in the rule set.
-- GitHub Action / pre-merge CI integration that posts the report as a PR
-  comment.
+- Post the report as a pull request comment from the GitHub Action.
 - Richer `unrelated_changes` scoping using commit message / PR description
   instead of a single `--task` string.
-- JSON output mode for machine consumption by other tooling.
 
 ## Known Limitations
 
@@ -247,9 +389,12 @@ review.
   changed test file suppresses the warning, even an unrelated test or a
   test file that was deleted. `*.test.jsx`/`*.test.tsx` names are not
   recognized.
-- **CLI and report-rendering code** (`cli.py`, `report.py`) only have
-  tests for secret redaction and configuration errors so far; argument
-  handling, exit codes and output files are not yet covered.
+- **SARIF locations for deleted lines** point at the file without a line,
+  so code scanning cannot highlight the deleted code itself. If the whole
+  file was deleted, the path no longer exists in the pull request's head.
+- **The GitHub Action** has only been checked locally (YAML parsing and
+  running its shell steps against the demo repository). It has not been
+  run on GitHub-hosted runners.
 - **Redaction** can only hide values that SECRET001 recognizes. A secret
   it does not detect is shown as-is. To stay on the safe side, a detected
   value is masked everywhere it appears as a whole word, so a very short
@@ -258,6 +403,19 @@ review.
   indentation within a deleted block and only applies to deleted lines.
 - **Ignore directives** are plain text: AgentProof does not check that a
   directive is inside a comment.
+
+## Running the tests
+
+```bash
+bash scripts/setup_demo_app.sh     # builds the demo-app fixture
+bash scripts/fetch_sarif_schema.sh # downloads the SARIF 2.1.0 schema (pinned, checksum-verified)
+pytest -v
+```
+
+The SARIF schema is published by OASIS under its IPR policy rather than an
+open-source license, so it is downloaded instead of committed. Without it,
+the schema-validation tests are reported as **skipped** ("SARIF schema
+validation was NOT performed"), not as passed.
 
 ## Testing and Hardening
 

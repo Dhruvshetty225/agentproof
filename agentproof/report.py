@@ -1,15 +1,24 @@
-"""Render an AuditReport to an HTML file using Jinja2."""
+"""Render an AuditReport as HTML (Jinja2) or JSON.
+
+Every renderer redacts the report first (see agentproof.redaction).
+SARIF output lives in agentproof.sarif; terminal output in agentproof.cli.
+"""
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from agentproof import __version__
 from agentproof.redaction import redact_report
-from agentproof.schema import AuditReport
+from agentproof.schema import AuditReport, Finding
 
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
+
+# Increase when the JSON structure changes in a way consumers must notice.
+JSON_SCHEMA_VERSION = 1
 
 
 def render_html(report: AuditReport) -> str:
@@ -30,8 +39,39 @@ def render_html(report: AuditReport) -> str:
     )
 
 
-def write_html_report(report: AuditReport, output_path: str = "agentproof-report.html") -> str:
-    html = render_html(report)
-    path = Path(output_path)
-    path.write_text(html, encoding="utf-8")
-    return str(path.resolve())
+def _finding_to_dict(finding: Finding) -> dict:
+    return {
+        "rule_id": finding.rule_id,
+        "severity": finding.severity.value,
+        "title": finding.title,
+        "file_path": finding.file_path,
+        "files": list(finding.paths) or [finding.file_path],
+        # "old": line numbers refer to the base version (deleted lines).
+        # "new": line numbers refer to the audited branch (added lines).
+        # null: the finding is about whole files, not lines.
+        "side": finding.side.value if finding.side else None,
+        "line_number": finding.line_number,
+        "end_line_number": finding.end_line_number,
+        "location": finding.location,
+        "evidence": finding.evidence,
+        "recommendation": finding.recommendation,
+    }
+
+
+def render_json(report: AuditReport) -> str:
+    report = redact_report(report)
+    data = {
+        "schema_version": JSON_SCHEMA_VERSION,
+        "tool": {"name": "agentproof", "version": __version__},
+        "base": report.base,
+        "branch": report.branch,
+        "task": report.task,
+        "config_source": report.config_source,
+        "risk_score": report.risk_score,
+        "recommendation": report.recommendation.value,
+        "counts_by_severity": report.counts_by_severity,
+        "changed_files": report.changed_files,
+        "findings": [_finding_to_dict(f) for f in report.findings],
+        "ignored_findings": [_finding_to_dict(f) for f in report.ignored_findings],
+    }
+    return json.dumps(data, indent=2) + "\n"

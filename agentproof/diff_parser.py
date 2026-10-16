@@ -75,14 +75,20 @@ def _file_path_from_header(minus_path: str, plus_path: str) -> str:
 
 
 def parse_diff(repo_path: str, base: str, branch: str) -> list[FileDiff]:
-    """Parse the diff between `base` and `branch` in the repo at `repo_path`.
+    """Parse the changes made on `branch` since it diverged from `base`.
+
+    This is git's three-dot diff (``base...branch``): it compares `branch`
+    with the merge base of the two refs, the same view as a pull request's
+    "Files changed" tab. Commits added to `base` after the branch was created
+    are therefore not shown as reversed changes. It needs enough history to
+    find the merge base (in CI, check out with full history).
 
     Returns one FileDiff per changed file, containing added and deleted
     lines along with their line numbers (new-file numbers for additions,
     old-file numbers for deletions).
     """
     repo = Repo(repo_path)
-    diff_text = repo.git.diff(base, branch, "-U0", "--no-color")
+    diff_text = repo.git.diff(f"{base}...{branch}", "-U0", "--no-color")
     return _parse_unified_diff(diff_text)
 
 

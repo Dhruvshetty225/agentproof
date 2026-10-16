@@ -1,0 +1,114 @@
+# Reusable GitHub Action: audit a pull request's changes with AgentProof.
+#
+# Safety notes:
+# * AgentProof is installed from this action's own source (github.action_path),
+#   never from the repository being audited, and it only reads git data. No
+#   code from the pull request is imported or executed.
+# * Inputs reach the shell only through environment variables, never through
+#   ${{ }} inside a script, so a hostile pull request title cannot inject
+#   shell commands.
+# * Use it from `pull_request` workflows, not `pull_request_target`.
+# * The caller must check out with full history (fetch-depth: 0) so the merge
+#   base of base and head can be found.
+name: AgentProof
+description: Audit the changes in a pull request for risky AI-generated edits using deterministic rules.
+
+inputs:
+  base:
+    description: Base commit or ref. Defaults to the pull request's base commit.
+    required: false
+    default: ${{ github.event.pull_request.base.sha }}
+  head:
+    description: Commit or ref with the changes. Defaults to the pull request's head commit.
+    required: false
+    default: ${{ github.event.pull_request.head.sha }}
+  task:
+    description: Task description for SCOPE001 (for example the pull request title). Empty skips SCOPE001.
+    required: false
+    default: ""
+  format:
+    description: Format of the report file (sarif, json, html or terminal).
+    required: false
+    default: sarif
+  output:
+    description: Path of the report file to write.
+    required: false
+    default: agentproof.sarif
+  config:
+    description: Optional path to a config file. Empty uses .agentproof.toml from the base commit.
+    required: false
+    default: ""
+  fail-on-reject:
+    description: Fail the step when AgentProof recommends REJECT ("true" or "false").
+    required: false
+    default: "true"
+  python-version:
+    description: Python version used to run AgentProof.
+    required: false
+    default: "3.12"
+
+outputs:
+  exit-code:
+    description: AgentProof's exit code (0 approve or review, 1 reject, 2 error).
+    value: ${{ steps.audit.outputs.exit-code }}
+  report:
+    description: Path of the report file.
+    value: ${{ inputs.output }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v7
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install AgentProof from the action's own source
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+      run: python -m pip install --disable-pip-version-check "$ACTION_PATH"
+
+    - name: Run AgentProof
+      id: audit
+      shell: bash
+      env:
+        AP_BASE: ${{ inputs.base }}
+        AP_HEAD: ${{ inputs.head }}
+        AP_TASK: ${{ inputs.task }}
+        AP_FORMAT: ${{ inputs.format }}
+        AP_OUTPUT: ${{ inputs.output }}
+        AP_CONFIG: ${{ inputs.config }}
+        COLUMNS: "160"
+      run: |
+        if [ -z "$AP_BASE" ] || [ -z "$AP_HEAD" ]; then
+          echo "::error::No base/head commit. Run on pull_request events or set the base and head inputs."
+          echo "exit-code=2" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        args=(audit --repo "$GITHUB_WORKSPACE" --base "$AP_BASE" --branch "$AP_HEAD")
+        if [ -n "$AP_TASK" ]; then args+=(--task "$AP_TASK"); fi
+        if [ -n "$AP_CONFIG" ]; then args+=(--config "$AP_CONFIG"); fi
+
+        # 1) Human-readable report in the job log.
+        code=0
+        agentproof "${args[@]}" || code=$?
+        # 2) The report file for upload. Same audit, different format.
+        agentproof "${args[@]}" --format "$AP_FORMAT" --output "$AP_OUTPUT" || true
+
+        echo "exit-code=$code" >> "$GITHUB_OUTPUT"
+
+    - name: Apply result
+      shell: bash
+      env:
+        EXIT_CODE: ${{ steps.audit.outputs.exit-code }}
+        FAIL_ON_REJECT: ${{ inputs.fail-on-reject }}
+      run: |
+        if [ "$EXIT_CODE" = "2" ]; then
+          echo "::error::AgentProof could not complete the audit (see the log above)."
+          exit 2
+        fi
+        if [ "$EXIT_CODE" = "1" ] && [ "$FAIL_ON_REJECT" = "true" ]; then
+          echo "::error::AgentProof recommends REJECT."
+          exit 1
+        fi

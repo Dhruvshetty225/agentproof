@@ -33,5 +33,8 @@ jobs:
       - name: Build demo-app test fixture
         run: bash scripts/setup_demo_app.sh
 
+      - name: Download the pinned SARIF schema (checksum-verified)
+        run: bash scripts/fetch_sarif_schema.sh
+
       - name: Run tests
         run: pytest -v
