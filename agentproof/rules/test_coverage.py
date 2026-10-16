@@ -1,4 +1,11 @@
-"""Flag production code changes that ship without any corresponding test update."""
+"""Flag production code changes that ship without any corresponding test update.
+
+This is test-file-change detection, not test coverage: a file counts as a
+test when its path matches a naming convention (see FileDiff.is_test_file).
+Known limitation: any changed test file suppresses the warning for the whole
+diff, even a test that is unrelated to the production change or a test file
+that was deleted.
+"""
 
 from __future__ import annotations
 

@@ -10,6 +10,16 @@ from git import Repo
 _HUNK_HEADER_RE = re.compile(r"^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@")
 _BINARY_HEADER_RE = re.compile(r"^Binary files (.+) and (.+) differ$")
 
+_TEST_DIRECTORY_NAMES = {"test", "tests"}
+_TEST_FILE_SUFFIXES = (
+    "_test.py",
+    ".test.js",
+    ".test.ts",
+    ".spec.js",
+    ".spec.ts",
+    "_test.go",
+)
+
 
 @dataclass
 class ChangedLine:
@@ -37,11 +47,21 @@ class FileDiff:
 
     @property
     def is_test_file(self) -> bool:
-        name = self.file_path.rsplit("/", 1)[-1]
+        """True if the path follows a common test-file naming convention.
+
+        This looks only at the file's path. It does not measure what, or how
+        much, the tests actually cover.
+        """
+        parts = self.file_path.split("/")
+        name = parts[-1]
+        lower_name = name.lower()
         return (
-            "test" in self.file_path.lower().split("/")
-            or name.startswith("test_")
-            or name.endswith("_test.py")
+            any(part.lower() in _TEST_DIRECTORY_NAMES for part in parts)
+            or lower_name.startswith("test_")
+            or lower_name == "conftest.py"
+            or lower_name.endswith(_TEST_FILE_SUFFIXES)
+            # Case-sensitive on purpose: "FooTest.java" is a test, "Latest.java" is not.
+            or name.endswith("Test.java")
         )
 
 

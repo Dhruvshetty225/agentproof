@@ -90,11 +90,15 @@ agentproof/
   engine.py    Runs all rules, deduplicates findings, scores risk,
                and produces the final AuditReport
   report.py    Renders an AuditReport to HTML via Jinja2
+  identifiers.py  Splits snake_case/camelCase names into words so rules
+                  match whole words instead of raw substrings
   rules/
-    auth.py             deleted auth/verify/permission/token/expiry checks
-    secrets.py          hardcoded api_key/password/secret/token, fake sk- keys
-    logging_safety.py   unsafe logging/printing of sensitive fields
-    test_coverage.py    production changes with no test changes
+    auth.py             deleted auth/permission/verify/csrf/token-expiry
+                        checks, including security decorators
+    secrets.py          hardcoded credentials (db_password = "..."), sk-,
+                        AWS, GitHub and Slack token shapes, PEM private keys
+    logging_safety.py   sensitive values passed to print/logging calls
+    test_coverage.py    production changes with no test-file changes
     unrelated_changes.py  changes that don't relate to the stated --task
     unreviewable_changes.py  binary file diffs and pure (content-free) renames
   templates/
@@ -137,11 +141,37 @@ review.
   "tokenizer" vs. "token") and correctly matches simple plurals (e.g.
   "tokens" vs. "token"). Treat its findings as a prompt to double-check,
   not a definitive verdict.
-- **Secret detection** catches Python/JS-style assignments
-  (`api_key = "..."`) and quoted-key config formats like JSON/YAML
-  (`"api_key": "..."`). It still won't catch secrets split across
-  multiple lines, built via string concatenation, base64-encoded, or
-  assigned without quotes around the value (e.g. unquoted YAML scalars).
+- **Deleted security checks (AUTH001)** match whole words of names, so
+  `is_authorized`, `isAuthorized` and `@require_role("admin")` are caught
+  while `author` and `tokenizer` are not. It still works line by line: it
+  reports that security-relevant code was deleted, not whether the deletion
+  weakens security (removing `@csrf_exempt` is flagged too). Comment-only
+  lines are skipped, but a trailing comment on a code line still counts,
+  and `#` lines such as C `#define` are treated as comments. Negated or
+  differently named checks (`unauthorized`, `is_staff`) are not in the word
+  list.
+- **Secret detection (SECRET001)** catches credential-named fields assigned
+  a quoted literal (`db_password = "..."`, `"api_key": "..."`) and the token
+  shapes it knows (`sk-`, AWS `AKIA...`, GitHub `ghp_/gho_/ghs_`, Slack
+  `xox[baprs]-`, PEM private-key headers). It still won't catch secrets
+  split across multiple lines, built via string concatenation,
+  base64-encoded, assigned without quotes (unquoted YAML scalars), held in
+  oddly named fields, or in other providers' formats. A quoted placeholder
+  such as `"${DB_PASSWORD}"` is still reported as a hardcoded value.
+- **Logging safety (LOG001)** ignores words inside static messages
+  (`logger.info("Reset token sent")`) and looks at the logged values:
+  arguments, f-string/template placeholders and quoted lookup keys. It only
+  sees a value through its name, so `logger.info(f"password={pw}")` is not
+  flagged, while `logger.info(mask(token))` still is. It checks one line at
+  a time, so log calls split over several lines are missed, and it
+  recognizes `print(...)` and `log`/`logger`/`logging` calls, not
+  `console.log`.
+- **Test coverage (TESTCOV001)** only detects whether a file that *looks
+  like* a test changed (`tests/`, `test_*.py`, `conftest.py`, `*.test.ts`,
+  `*Test.java`, `*_test.go`, ...). It does not measure coverage. Any
+  changed test file suppresses the warning, even an unrelated test or a
+  test file that was deleted. `*.test.jsx`/`*.test.tsx` names are not
+  recognized.
 - **CLI and report-rendering code** (`cli.py`, `report.py`) aren't yet
   covered by the test suite — only the diff parser, rule engine, and
   scoring logic are. The tool's core logic is well-tested; the
