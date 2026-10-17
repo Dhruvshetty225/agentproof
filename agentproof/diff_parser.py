@@ -88,7 +88,21 @@ def parse_diff(repo_path: str, base: str, branch: str) -> list[FileDiff]:
     old-file numbers for deletions).
     """
     repo = Repo(repo_path)
-    diff_text = repo.git.diff(f"{base}...{branch}", "-U0", "--no-color")
+    diff_text = repo.git.diff(
+        "-U0",
+        "--no-color",
+        # The user's git settings must not change what the parser reads: an
+        # external diff tool (diff.external) would print another format, a
+        # textconv filter would rewrite file contents, and diff.interHunkContext
+        # would add unchanged lines between changes, which the parser ignores.
+        "--no-ext-diff",
+        "--no-textconv",
+        "--inter-hunk-context=0",
+        # Anything after this is a revision, never an option, even if it
+        # starts with "-" (such as --base=--output=FILE).
+        "--end-of-options",
+        f"{base}...{branch}",
+    )
     return _parse_unified_diff(diff_text)
 
 
