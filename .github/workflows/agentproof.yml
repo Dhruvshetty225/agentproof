@@ -1,0 +1,58 @@
+# Audit every pull request to this repository with AgentProof's own GitHub
+# Action. It is examples/agentproof-pull-request.yml with the action pinned to
+# a reviewed commit of this repository.
+#
+# * Running it uses GitHub Actions minutes. Standard GitHub-hosted runners are
+#   free for public repositories such as this one.
+# * The code scanning upload works because code scanning is available for
+#   public repositories.
+name: AgentProof
+
+on:
+  # pull_request (not pull_request_target): fork pull requests run with a
+  # read-only token and no secrets, which is what an audit of untrusted
+  # changes should have.
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # only for the code scanning upload
+    steps:
+      - name: Check out with full history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # AgentProof needs the merge base of base and head
+          persist-credentials: false # the audit never pushes
+
+      - name: Run AgentProof
+        id: agentproof
+        # Commit 7828f89 of this repository (main when this file was added).
+        uses: Dhruvshetty225/agentproof@7828f89d64aaaea623b6723b4bb6bd82ae0c6e7d
+        with:
+          task: ${{ github.event.pull_request.title }}
+          format: sarif
+          output: agentproof.sarif
+          fail-on-reject: "true"
+
+      - name: Upload the report as a workflow artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: agentproof-report
+          path: agentproof.sarif
+          if-no-files-found: warn
+
+      - name: Upload SARIF to code scanning
+        # Fork pull requests get a read-only token, so this upload would fail.
+        if: ${{ !cancelled() && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: agentproof.sarif
+          category: agentproof
