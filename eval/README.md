@@ -35,7 +35,7 @@ That command only reads committed files (`manifest.csv`,
 | `run_rules.py` | Adapter that runs one AgentProof version on the prepared diffs | yes |
 | `run_eval.py` | Runs the original and improved versions and writes `results/` | yes |
 | `results/` | Metrics, predictions, comparison table, charts, environment | yes |
-| `run_llm_eval.py` | Rules only vs LLM only vs hybrid with a local Ollama model (see `docs/LLM_VERIFIER.md`); not run yet | yes |
+| `run_llm_eval.py`, `results/llm/` | Rules only vs LLM only vs hybrid with a local Ollama model; run with `qwen2.5-coder:1.5b` (see `docs/LLM_VERIFIER.md`) | yes |
 | `data/real/<case_id>/` | `metadata.json` (incl. PR description) and `pr.diff` for each real case | **no** (see below) |
 
 The real diffs and PR descriptions are third-party content under many

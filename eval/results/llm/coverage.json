@@ -1,0 +1,38 @@
+{
+  "selected": 98,
+  "processed": 98,
+  "scored": 96,
+  "not_processed": [],
+  "excluded_llm_only_failed": {
+    "gh-electron-forge__electron-forge-docs-261": "malformed_reply",
+    "gh-novuhq__novu-11754": "malformed_reply"
+  },
+  "outcomes": {
+    "hybrid": {
+      "unit": "findings",
+      "by_status": {
+        "confirmed_risky": 90,
+        "malformed_reply": 4,
+        "not_eligible_critical": 2,
+        "possible_prompt_injection": 1
+      },
+      "by_group": {
+        "failure: malformed reply": 4,
+        "kept by policy (critical finding, model not asked)": 2,
+        "kept by the injection check (model not asked)": 1,
+        "model decision": 90
+      }
+    },
+    "llm_only": {
+      "unit": "cases",
+      "by_status": {
+        "answered": 96,
+        "malformed_reply": 2
+      },
+      "by_group": {
+        "failure: malformed reply": 2,
+        "model decision": 96
+      }
+    }
+  }
+}

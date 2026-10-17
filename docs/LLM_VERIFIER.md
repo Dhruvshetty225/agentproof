@@ -4,10 +4,10 @@
 finding is actually risky. It is off by default. Without the flag, AgentProof
 behaves and reports exactly as before.
 
-**Benchmark status: not run yet.** No accuracy or speed numbers exist for the
-verifier, because Ollama was not installed on the machine used for this
-project when the code was written. The commands below produce them once a
-model is installed.
+**Benchmark status: run once, with the fallback model `qwen2.5-coder:1.5b`.**
+See [Measured results](#measured-results-qwen25-coder15b). The preferred
+`qwen2.5-coder:7b` was only checked on 5 cases, because its full run froze
+the 8 GB Mac used for this project.
 
 ## How it works
 
@@ -178,3 +178,95 @@ prints "Benchmark not run" and writes nothing.
 The tests (`tests/test_llm_verify.py`, `tests/test_llm_ollama_http.py`,
 `tests/test_eval_llm.py`) use a fake model and a fake Ollama server. They
 check AgentProof's logic, not the model's quality, and are not benchmarks.
+
+## Measured results (qwen2.5-coder:1.5b)
+
+Every number below comes from the files in `eval/results/llm/`, written by:
+
+```bash
+python -m eval.run_llm_eval --model qwen2.5-coder:1.5b
+```
+
+The run used the following setup (all recorded in `environment.json`):
+
+- commit `aafd795`, Ollama 0.20.6;
+- temperature 0, seed 0, a 4,096-token context and a 120 s timeout;
+- one untimed warm-up call of 2.4 s;
+- the MacBook Air M3 with 8 GB described above.
+
+It took about 12 minutes for all 98 cases. This is one run of one small
+model; it says nothing about larger models.
+
+**Coverage** (`coverage.json`):
+
+- **Processed:** all 98 reviewed cases.
+- **Scored:** 96. That is 76 real cases (38 development, 38 held-out) and
+  20 synthetic.
+- **Excluded:** 2 held-out cases whose LLM-only reply was malformed:
+  `gh-electron-forge__electron-forge-docs-261` and `gh-novuhq__novu-11754`.
+  They are excluded from all three modes and are not counted as safe.
+- **Not run:** none. No call timed out and Ollama was always reachable.
+
+How every model call ended:
+
+| Outcome | Hybrid (one call per finding) | LLM only (one call per case) |
+|---|---|---|
+| Model decision | 90 (all "risky"; none "not risky") | 96 |
+| Kept by policy (critical finding, model not asked) | 2 | - |
+| Kept by the injection check (model not asked) | 1 | - |
+| Failure: malformed reply (finding kept) | 4 | 2 |
+
+**Scores** (precision / recall / F1, from `comparison.md`):
+
+| Cases | Rules only | LLM only | Hybrid |
+|---|---|---|---|
+| Real, all 76: any finding vs is_risky | 0.61 / 0.93 / 0.74 | 0.36 / 1.00 / 0.52 | 0.61 / 0.93 / 0.74 |
+| Real, all 76: TESTCOV001 | 0.71 / 0.92 / 0.80 | 0.00 / 0.00 / 0.00 | 0.71 / 0.92 / 0.80 |
+| Real, development 38: any finding | 0.67 / 1.00 / 0.80 | 0.37 / 1.00 / 0.54 | 0.67 / 1.00 / 0.80 |
+| Real, **held-out** 38: any finding | 0.55 / 0.85 / 0.67 | 0.34 / 1.00 / 0.51 | 0.55 / 0.85 / 0.67 |
+| Synthetic 20: any finding | 1.00 / 1.00 / 1.00 | 0.55 / 1.00 / 0.71 | 1.00 / 1.00 / 1.00 |
+| Synthetic 20: security rules | 1.00 / 1.00 / 1.00 | 0.54 / 1.00 / 0.70 | 1.00 / 1.00 / 1.00 |
+
+Average time per case:
+
+| Cases | Rules only | Hybrid | LLM only |
+|---|---|---|---|
+| Real, all 76 | 0.00 s | 2.28 s | 4.82 s |
+| Synthetic 20 | 0.00 s | 1.22 s | 2.35 s |
+
+The rules-only scores differ slightly from `eval/results/README.md` because
+the 2 excluded cases are left out here.
+
+**What this run shows:**
+
+- **The hybrid verifier changed nothing.** All 90 of the model's decisions
+  were "risky", so it suppressed no finding, and its scores equal the rules'
+  scores. It added about 2 seconds per case.
+- **LLM only reported a risk for every scored case.** Its recall of 1.00 is
+  therefore not a sign of good detection. Its precision is well below the
+  rules': 0.36 vs 0.61 on all real cases, and 0.34 vs 0.55 on held-out
+  cases. On real cases it reported AUTH001, SECRET001 and LOG001, which no
+  real case is labeled with (precision 0.00 for each). It found none of the
+  24 real TESTCOV001 cases.
+- **In this run, the local LLM did not improve on the rules.** This is
+  measured only for `qwen2.5-coder:1.5b`, a model much weaker than the
+  preferred 7B one. Whether a larger model would help was not measured.
+
+To check the claim that LLM only reported something for every scored case,
+using `predictions.csv`:
+
+```bash
+python -c "import csv; r=[x for x in csv.DictReader(open('eval/results/llm/predictions.csv')) if x['mode']=='llm_only' and x['scored']=='yes']; print(sum(bool(x['reported_rules']) for x in r), 'of', len(r))"
+```
+
+Limitations of this run:
+
+- **One run, one small model.** There is one run per case, and model answers
+  can change with another Ollama or model version.
+- **Truncated diffs.** In LLM only, 22 diffs were longer than the
+  8,000-character limit, so the model saw only their start.
+- **The verifier's input differs between modes.** The hybrid verifier only
+  sees about 20 changed lines around each finding.
+- **The labels' limits apply here too.** The labels have no real security
+  positives, and the synthetic cases were written knowing how the rules
+  work.

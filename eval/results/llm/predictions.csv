@@ -1,0 +1,295 @@
+mode,case_id,kind,split,scored,labeled_rules,reported_rules,recommendation,seconds,calls
+rules,gh-1600822305__AetherLink-265,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.001,{}
+rules,gh-AICMO__Autonomous-Agent-X-Bluesky-3428,real,dev,yes,,,approve,0.003,{}
+rules,gh-AICMO__Autonomous-Agent-X-Bluesky-3429,real,dev,yes,,,approve,0.003,{}
+rules,gh-Apolloccrypt__paramant-relay-261,real,dev,yes,,,approve,0.001,{}
+rules,gh-AtomicBot-ai__Atomic-Chat-143,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.000,{}
+rules,gh-BerriAI__litellm-31778,real,dev,yes,,,approve,0.006,{}
+rules,gh-BerriAI__litellm-31784,real,dev,yes,,SECRET001,review,0.002,{}
+rules,gh-Crossmint__crossmint-sdk-1962,real,heldout,yes,,,approve,0.004,{}
+rules,gh-Fiestaboard__FiestaBoard-1336,real,heldout,yes,,,approve,0.001,{}
+rules,gh-Francis1998__agentic-career-search-17,real,heldout,yes,,AUTH001,approve,0.001,{}
+rules,gh-Francis1998__nexus-llm-router-19,real,heldout,yes,,,approve,0.001,{}
+rules,gh-FriendlyInternet__nuxt-crouton-1044,real,heldout,yes,,,approve,0.000,{}
+rules,gh-JGG0sbp66__ohmyblog-60,real,heldout,yes,TESTCOV001,TESTCOV001,approve,0.001,{}
+rules,gh-KawaYiLab__InterKnot-Web-64,real,heldout,yes,TESTCOV001,,approve,0.000,{}
+rules,gh-KawaYiLab__InterKnot-Web-65,real,heldout,yes,,,approve,0.000,{}
+rules,gh-MarkusNeusinger__anyplot-9577,real,dev,yes,,,approve,0.000,{}
+rules,gh-MetaMask__metamask-mobile-32639,real,dev,yes,,,approve,0.002,{}
+rules,gh-NatLabRockies__openstudio-mcp-78,real,dev,yes,,,approve,0.000,{}
+rules,gh-PCGen__pcgen-7653,real,dev,yes,SCOPE001,AUTH001,approve,0.002,{}
+rules,gh-PhantomBot__PhantomBot-3741,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.000,{}
+rules,gh-PhantomBot__PhantomBot-3743,real,dev,yes,,TESTCOV001,approve,0.000,{}
+rules,gh-ROCm__rocm-xio-192,real,dev,yes,,TESTCOV001,approve,0.001,{}
+rules,gh-ZeroPointSix__outlookEmailPlus-88,real,heldout,yes,,SECRET001,review,0.006,{}
+rules,gh-airbytehq__airbyte-81354,real,heldout,yes,,,approve,0.000,{}
+rules,gh-airbytehq__airbyte-81358,real,heldout,yes,,,approve,0.001,{}
+rules,gh-asap-protocol__asap-protocol-259,real,dev,yes,,,approve,0.001,{}
+rules,gh-baranwang__homebridge-plugin-haier-66,real,dev,yes,,,approve,0.000,{}
+rules,gh-baranwang__homebridge-plugin-haier-68,real,dev,yes,,,approve,0.000,{}
+rules,gh-beercss__beercss-642,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.000,{}
+rules,gh-binarywang__WxJava-4060,real,heldout,yes,TESTCOV001,TESTCOV001,approve,0.001,{}
+rules,gh-blaxel-ai__sandbox-240,real,heldout,yes,,,approve,0.000,{}
+rules,gh-dabit3__react-native-ai-73,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.002,{}
+rules,gh-dfinity__oisy-wallet-13302,real,heldout,yes,,,approve,0.001,{}
+rules,gh-dimagi__open-chat-studio-3730,real,heldout,yes,,TESTCOV001,approve,0.001,{}
+rules,gh-dotnet__runtime-130061,real,heldout,yes,TESTCOV001,AUTH001;TESTCOV001,reject,0.003,{}
+rules,gh-duckduckgo__autoconsent-1418,real,heldout,yes,,,approve,0.000,{}
+rules,gh-electron-forge__electron-forge-docs-261,real,heldout,no,,,approve,0.001,{}
+rules,gh-electron-userland__electron-windows-msix-38,real,heldout,yes,TESTCOV001,,approve,0.001,{}
+rules,gh-electron__forge-4304,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.002,{}
+rules,gh-electron__osx-sign-432,real,heldout,yes,,,approve,0.001,{}
+rules,gh-electron__rebuild-1290,real,heldout,yes,,,approve,0.000,{}
+rules,gh-electron__sheriff-135,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.001,{}
+rules,gh-electron__windows-installer-607,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.001,{}
+rules,gh-electron__windows-sign-116,real,heldout,yes,,,approve,0.000,{}
+rules,gh-fern-api__fern-16826,real,heldout,yes,TESTCOV001,TESTCOV001,approve,0.001,{}
+rules,gh-firecrawl__firecrawl-3930,real,dev,yes,,,approve,0.001,{}
+rules,gh-github__gh-aw-42590,real,heldout,yes,SCOPE001,AUTH001,approve,0.008,{}
+rules,gh-github__gh-aw-42593,real,heldout,yes,,,approve,0.001,{}
+rules,gh-harness__mcp-server-509,real,heldout,yes,,AUTH001,approve,0.005,{}
+rules,gh-harness__mcp-server-510,real,heldout,yes,SCOPE001,AUTH001,approve,0.004,{}
+rules,gh-itsoltech__canopy-desktop-304,real,heldout,yes,TESTCOV001,TESTCOV001,approve,0.001,{}
+rules,gh-kentang2017__kintaiyi-43,real,heldout,yes,,TESTCOV001,approve,0.001,{}
+rules,gh-kentang2017__kintaiyi-44,real,heldout,yes,TESTCOV001,TESTCOV001,approve,0.005,{}
+rules,gh-kentcdodds__kody-578,real,dev,yes,,AUTH001,reject,0.004,{}
+rules,gh-libsndfile__libsndfile-1136,real,heldout,yes,TESTCOV001,TESTCOV001,approve,0.001,{}
+rules,gh-light-curve__light-curve-python-808,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.003,{}
+rules,gh-lucasew__ts-proxy-256,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.001,{}
+rules,gh-madara88645__Compiler-911,real,dev,yes,,,approve,0.001,{}
+rules,gh-mastra-ai__mastra-18721,real,heldout,yes,,TESTCOV001,approve,0.000,{}
+rules,gh-mastra-ai__mastra-18735,real,heldout,yes,,,approve,0.005,{}
+rules,gh-mattermost__desktop-3880,real,dev,yes,,TESTCOV001,approve,0.002,{}
+rules,gh-mattermost__mattermost-37320,real,dev,yes,,,approve,0.000,{}
+rules,gh-microsoft__FLAML-1566,real,dev,yes,,,approve,0.000,{}
+rules,gh-microsoft__mcs-labs-486,real,heldout,yes,,AUTH001,reject,0.008,{}
+rules,gh-mweinbach__agent-coworker-192,real,dev,yes,,,approve,0.001,{}
+rules,gh-novuhq__novu-11754,real,heldout,no,,AUTH001,reject,0.015,{}
+rules,gh-opensanctions__opensanctions-4746,real,heldout,yes,TESTCOV001,TESTCOV001,approve,0.000,{}
+rules,gh-opsmill__infrahub-9774,real,dev,yes,,,approve,0.000,{}
+rules,gh-programmierbar__website-203,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.001,{}
+rules,gh-randyap8-wq__Micro-Expert-Router-SSD-Streamed-MoE-MER-130,real,dev,yes,,TESTCOV001,approve,0.005,{}
+rules,gh-rdlabo-dev__ionic-angular-library-7,real,heldout,yes,,,approve,0.001,{}
+rules,gh-tdealer01-crypto__tdealer01-crypto-dsg-control-plane-819,real,heldout,yes,,SECRET001,review,0.003,{}
+rules,gh-ueberdosis__tiptap-docs-879,real,dev,yes,,,approve,0.001,{}
+rules,gh-vellum-ai__vellum-assistant-36782,real,dev,yes,,TESTCOV001,approve,0.000,{}
+rules,gh-vellum-ai__vellum-assistant-36784,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.000,{}
+rules,gh-yoy123__lmstudio-copilot-provider-26,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.002,{}
+rules,gh-yuanjian-org__app-1268,real,heldout,yes,,TESTCOV001,approve,0.000,{}
+rules,gh-yuanjian-org__app-1270,real,heldout,yes,SCOPE001;TESTCOV001,SCOPE001;TESTCOV001;UNREVIEWABLE001,review,0.006,{}
+rules,syn-01-auth-expiry-removed,synthetic,dev,yes,AUTH001,AUTH001,approve,0.000,{}
+rules,syn-02-auth-decorator-removed,synthetic,dev,yes,AUTH001,AUTH001,approve,0.000,{}
+rules,syn-03-auth-admin-check-removed-js,synthetic,dev,yes,AUTH001,AUTH001,approve,0.000,{}
+rules,syn-04-auth-unrelated-names,synthetic,dev,yes,,,approve,0.000,{}
+rules,syn-05-auth-comment-only,synthetic,dev,yes,,,approve,0.000,{}
+rules,syn-06-secret-aws-key-id,synthetic,dev,yes,SECRET001,SCOPE001;SECRET001,review,0.000,{}
+rules,syn-07-secret-db-password,synthetic,dev,yes,SECRET001,SECRET001,approve,0.000,{}
+rules,syn-08-secret-env-lookup,synthetic,dev,yes,,,approve,0.000,{}
+rules,syn-09-secret-public-key,synthetic,dev,yes,,,approve,0.000,{}
+rules,syn-10-log-token-fstring,synthetic,dev,yes,LOG001,LOG001,approve,0.000,{}
+rules,syn-11-log-password-argument,synthetic,dev,yes,LOG001,LOG001,approve,0.000,{}
+rules,syn-12-log-static-message,synthetic,dev,yes,,,approve,0.000,{}
+rules,syn-13-testcov-no-tests,synthetic,dev,yes,TESTCOV001,TESTCOV001,approve,0.000,{}
+rules,syn-14-testcov-with-spec,synthetic,dev,yes,,,approve,0.000,{}
+rules,syn-15-testcov-docs-only,synthetic,dev,yes,,,approve,0.000,{}
+rules,syn-16-scope-unrelated-file,synthetic,dev,yes,SCOPE001,SCOPE001,approve,0.000,{}
+rules,syn-17-scope-related-change,synthetic,dev,yes,,,approve,0.000,{}
+rules,syn-18-unreviewable-binary,synthetic,dev,yes,UNREVIEWABLE001,UNREVIEWABLE001,approve,0.000,{}
+rules,syn-19-unreviewable-pure-rename,synthetic,dev,yes,UNREVIEWABLE001,TESTCOV001;UNREVIEWABLE001,approve,0.000,{}
+rules,syn-20-clean-change,synthetic,dev,yes,,,approve,0.000,{}
+llm_only,gh-1600822305__AetherLink-265,real,dev,yes,TESTCOV001,SECRET001,n/a,4.526,"{""answered"": 1}"
+llm_only,gh-AICMO__Autonomous-Agent-X-Bluesky-3428,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,6.817,"{""answered"": 1}"
+llm_only,gh-AICMO__Autonomous-Agent-X-Bluesky-3429,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,6.575,"{""answered"": 1}"
+llm_only,gh-Apolloccrypt__paramant-relay-261,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,3.443,"{""answered"": 1}"
+llm_only,gh-AtomicBot-ai__Atomic-Chat-143,real,dev,yes,TESTCOV001,SCOPE001,n/a,2.270,"{""answered"": 1}"
+llm_only,gh-BerriAI__litellm-31778,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,5.333,"{""answered"": 1}"
+llm_only,gh-BerriAI__litellm-31784,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,3.830,"{""answered"": 1}"
+llm_only,gh-Crossmint__crossmint-sdk-1962,real,heldout,yes,,AUTH001;LOG001;SECRET001,n/a,7.827,"{""answered"": 1}"
+llm_only,gh-Fiestaboard__FiestaBoard-1336,real,heldout,yes,,SCOPE001,n/a,2.574,"{""answered"": 1}"
+llm_only,gh-Francis1998__agentic-career-search-17,real,heldout,yes,,AUTH001;LOG001;SECRET001,n/a,3.665,"{""answered"": 1}"
+llm_only,gh-Francis1998__nexus-llm-router-19,real,heldout,yes,,AUTH001;LOG001;SCOPE001;SECRET001,n/a,3.263,"{""answered"": 1}"
+llm_only,gh-FriendlyInternet__nuxt-crouton-1044,real,heldout,yes,,AUTH001;LOG001;SCOPE001;SECRET001,n/a,4.069,"{""answered"": 1}"
+llm_only,gh-JGG0sbp66__ohmyblog-60,real,heldout,yes,TESTCOV001,SCOPE001,n/a,2.298,"{""answered"": 1}"
+llm_only,gh-KawaYiLab__InterKnot-Web-64,real,heldout,yes,TESTCOV001,AUTH001;LOG001;SCOPE001;SECRET001,n/a,3.102,"{""answered"": 1}"
+llm_only,gh-KawaYiLab__InterKnot-Web-65,real,heldout,yes,,SECRET001,n/a,2.314,"{""answered"": 1}"
+llm_only,gh-MarkusNeusinger__anyplot-9577,real,dev,yes,,SCOPE001,n/a,2.179,"{""answered"": 1}"
+llm_only,gh-MetaMask__metamask-mobile-32639,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,4.491,"{""answered"": 1}"
+llm_only,gh-NatLabRockies__openstudio-mcp-78,real,dev,yes,,SCOPE001,n/a,2.472,"{""answered"": 1}"
+llm_only,gh-PCGen__pcgen-7653,real,dev,yes,SCOPE001,AUTH001;LOG001;SECRET001,n/a,5.613,"{""answered"": 1}"
+llm_only,gh-PhantomBot__PhantomBot-3741,real,dev,yes,TESTCOV001,SCOPE001,n/a,2.629,"{""answered"": 1}"
+llm_only,gh-PhantomBot__PhantomBot-3743,real,dev,yes,,LOG001,n/a,1.805,"{""answered"": 1}"
+llm_only,gh-ROCm__rocm-xio-192,real,dev,yes,,SCOPE001,n/a,2.977,"{""answered"": 1}"
+llm_only,gh-ZeroPointSix__outlookEmailPlus-88,real,heldout,yes,,SECRET001,n/a,6.410,"{""answered"": 1}"
+llm_only,gh-airbytehq__airbyte-81354,real,heldout,yes,,AUTH001;LOG001;SECRET001,n/a,3.153,"{""answered"": 1}"
+llm_only,gh-airbytehq__airbyte-81358,real,heldout,yes,,SCOPE001,n/a,2.785,"{""answered"": 1}"
+llm_only,gh-asap-protocol__asap-protocol-259,real,dev,yes,,AUTH001;LOG001;SECRET001;TESTCOV001,n/a,3.329,"{""answered"": 1}"
+llm_only,gh-baranwang__homebridge-plugin-haier-66,real,dev,yes,,SCOPE001,n/a,1.816,"{""answered"": 1}"
+llm_only,gh-baranwang__homebridge-plugin-haier-68,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,2.378,"{""answered"": 1}"
+llm_only,gh-beercss__beercss-642,real,dev,yes,TESTCOV001,SCOPE001,n/a,2.555,"{""answered"": 1}"
+llm_only,gh-binarywang__WxJava-4060,real,heldout,yes,TESTCOV001,SECRET001,n/a,4.595,"{""answered"": 1}"
+llm_only,gh-blaxel-ai__sandbox-240,real,heldout,yes,,AUTH001;LOG001;SECRET001,n/a,3.674,"{""answered"": 1}"
+llm_only,gh-dabit3__react-native-ai-73,real,dev,yes,TESTCOV001,SECRET001,n/a,7.595,"{""answered"": 1}"
+llm_only,gh-dfinity__oisy-wallet-13302,real,heldout,yes,,AUTH001;LOG001;SECRET001;TESTCOV001,n/a,6.122,"{""answered"": 1}"
+llm_only,gh-dimagi__open-chat-studio-3730,real,heldout,yes,,SCOPE001,n/a,4.650,"{""answered"": 1}"
+llm_only,gh-dotnet__runtime-130061,real,heldout,yes,TESTCOV001,SCOPE001,n/a,5.291,"{""answered"": 1}"
+llm_only,gh-duckduckgo__autoconsent-1418,real,heldout,yes,,AUTH001;LOG001;SCOPE001;SECRET001,n/a,4.139,"{""answered"": 1}"
+llm_only,gh-electron-forge__electron-forge-docs-261,real,heldout,no,,,n/a,6.258,"{""malformed_reply"": 1}"
+llm_only,gh-electron-userland__electron-windows-msix-38,real,heldout,yes,TESTCOV001,SCOPE001,n/a,3.641,"{""answered"": 1}"
+llm_only,gh-electron__forge-4304,real,dev,yes,TESTCOV001,SCOPE001,n/a,5.638,"{""answered"": 1}"
+llm_only,gh-electron__osx-sign-432,real,heldout,yes,,AUTH001;LOG001;SECRET001,n/a,5.744,"{""answered"": 1}"
+llm_only,gh-electron__rebuild-1290,real,heldout,yes,,SCOPE001,n/a,4.577,"{""answered"": 1}"
+llm_only,gh-electron__sheriff-135,real,dev,yes,TESTCOV001,AUTH001;LOG001;SECRET001,n/a,5.852,"{""answered"": 1}"
+llm_only,gh-electron__windows-installer-607,real,dev,yes,TESTCOV001,SCOPE001,n/a,4.664,"{""answered"": 1}"
+llm_only,gh-electron__windows-sign-116,real,heldout,yes,,SECRET001,n/a,2.710,"{""answered"": 1}"
+llm_only,gh-fern-api__fern-16826,real,heldout,yes,TESTCOV001,AUTH001;LOG001;SECRET001,n/a,5.583,"{""answered"": 1}"
+llm_only,gh-firecrawl__firecrawl-3930,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,6.764,"{""answered"": 1}"
+llm_only,gh-github__gh-aw-42590,real,heldout,yes,SCOPE001,SCOPE001,n/a,7.495,"{""answered"": 1}"
+llm_only,gh-github__gh-aw-42593,real,heldout,yes,,SCOPE001,n/a,4.122,"{""answered"": 1}"
+llm_only,gh-harness__mcp-server-509,real,heldout,yes,,AUTH001;LOG001;SCOPE001;SECRET001,n/a,6.479,"{""answered"": 1}"
+llm_only,gh-harness__mcp-server-510,real,heldout,yes,SCOPE001,AUTH001;LOG001,n/a,6.656,"{""answered"": 1}"
+llm_only,gh-itsoltech__canopy-desktop-304,real,heldout,yes,TESTCOV001,AUTH001;LOG001;SECRET001,n/a,6.039,"{""answered"": 1}"
+llm_only,gh-kentang2017__kintaiyi-43,real,heldout,yes,,SCOPE001,n/a,3.976,"{""answered"": 1}"
+llm_only,gh-kentang2017__kintaiyi-44,real,heldout,yes,TESTCOV001,AUTH001;LOG001;SECRET001,n/a,11.055,"{""answered"": 1}"
+llm_only,gh-kentcdodds__kody-578,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,7.042,"{""answered"": 1}"
+llm_only,gh-libsndfile__libsndfile-1136,real,heldout,yes,TESTCOV001,SCOPE001,n/a,2.262,"{""answered"": 1}"
+llm_only,gh-light-curve__light-curve-python-808,real,dev,yes,TESTCOV001,AUTH001;LOG001;SECRET001,n/a,11.211,"{""answered"": 1}"
+llm_only,gh-lucasew__ts-proxy-256,real,dev,yes,TESTCOV001,LOG001,n/a,4.530,"{""answered"": 1}"
+llm_only,gh-madara88645__Compiler-911,real,dev,yes,,AUTH001;LOG001;SCOPE001;SECRET001,n/a,5.894,"{""answered"": 1}"
+llm_only,gh-mastra-ai__mastra-18721,real,heldout,yes,,AUTH001;LOG001;SECRET001,n/a,3.937,"{""answered"": 1}"
+llm_only,gh-mastra-ai__mastra-18735,real,heldout,yes,,AUTH001;LOG001;SCOPE001;SECRET001,n/a,8.002,"{""answered"": 1}"
+llm_only,gh-mattermost__desktop-3880,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,9.504,"{""answered"": 1}"
+llm_only,gh-mattermost__mattermost-37320,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,3.530,"{""answered"": 1}"
+llm_only,gh-microsoft__FLAML-1566,real,dev,yes,,SCOPE001,n/a,3.506,"{""answered"": 1}"
+llm_only,gh-microsoft__mcs-labs-486,real,heldout,yes,,SCOPE001,n/a,6.064,"{""answered"": 1}"
+llm_only,gh-mweinbach__agent-coworker-192,real,dev,yes,,AUTH001;LOG001;SECRET001;TESTCOV001,n/a,4.814,"{""answered"": 1}"
+llm_only,gh-novuhq__novu-11754,real,heldout,no,,,n/a,10.818,"{""malformed_reply"": 1}"
+llm_only,gh-opensanctions__opensanctions-4746,real,heldout,yes,TESTCOV001,SCOPE001,n/a,2.897,"{""answered"": 1}"
+llm_only,gh-opsmill__infrahub-9774,real,dev,yes,,SCOPE001,n/a,2.474,"{""answered"": 1}"
+llm_only,gh-programmierbar__website-203,real,dev,yes,TESTCOV001,SCOPE001,n/a,2.843,"{""answered"": 1}"
+llm_only,gh-randyap8-wq__Micro-Expert-Router-SSD-Streamed-MoE-MER-130,real,dev,yes,,SCOPE001,n/a,6.721,"{""answered"": 1}"
+llm_only,gh-rdlabo-dev__ionic-angular-library-7,real,heldout,yes,,AUTH001;LOG001;SECRET001,n/a,5.436,"{""answered"": 1}"
+llm_only,gh-tdealer01-crypto__tdealer01-crypto-dsg-control-plane-819,real,heldout,yes,,AUTH001;LOG001;SECRET001,n/a,8.025,"{""answered"": 1}"
+llm_only,gh-ueberdosis__tiptap-docs-879,real,dev,yes,,AUTH001;LOG001;SECRET001,n/a,5.610,"{""answered"": 1}"
+llm_only,gh-vellum-ai__vellum-assistant-36782,real,dev,yes,,SCOPE001,n/a,3.221,"{""answered"": 1}"
+llm_only,gh-vellum-ai__vellum-assistant-36784,real,dev,yes,TESTCOV001,SECRET001,n/a,3.934,"{""answered"": 1}"
+llm_only,gh-yoy123__lmstudio-copilot-provider-26,real,dev,yes,TESTCOV001,SCOPE001,n/a,7.384,"{""answered"": 1}"
+llm_only,gh-yuanjian-org__app-1268,real,heldout,yes,,AUTH001;LOG001;SECRET001,n/a,4.768,"{""answered"": 1}"
+llm_only,gh-yuanjian-org__app-1270,real,heldout,yes,SCOPE001;TESTCOV001,AUTH001;LOG001;SECRET001,n/a,8.982,"{""answered"": 1}"
+llm_only,syn-01-auth-expiry-removed,synthetic,dev,yes,AUTH001,SECRET001,n/a,1.986,"{""answered"": 1}"
+llm_only,syn-02-auth-decorator-removed,synthetic,dev,yes,AUTH001,SECRET001,n/a,2.348,"{""answered"": 1}"
+llm_only,syn-03-auth-admin-check-removed-js,synthetic,dev,yes,AUTH001,SECRET001,n/a,2.312,"{""answered"": 1}"
+llm_only,syn-04-auth-unrelated-names,synthetic,dev,yes,,SCOPE001,n/a,2.200,"{""answered"": 1}"
+llm_only,syn-05-auth-comment-only,synthetic,dev,yes,,AUTH001;SCOPE001,n/a,2.993,"{""answered"": 1}"
+llm_only,syn-06-secret-aws-key-id,synthetic,dev,yes,SECRET001,SECRET001,n/a,2.036,"{""answered"": 1}"
+llm_only,syn-07-secret-db-password,synthetic,dev,yes,SECRET001,SECRET001,n/a,2.198,"{""answered"": 1}"
+llm_only,syn-08-secret-env-lookup,synthetic,dev,yes,,SECRET001,n/a,2.136,"{""answered"": 1}"
+llm_only,syn-09-secret-public-key,synthetic,dev,yes,,AUTH001;SECRET001,n/a,3.101,"{""answered"": 1}"
+llm_only,syn-10-log-token-fstring,synthetic,dev,yes,LOG001,LOG001,n/a,2.211,"{""answered"": 1}"
+llm_only,syn-11-log-password-argument,synthetic,dev,yes,LOG001,AUTH001;LOG001;SECRET001,n/a,2.882,"{""answered"": 1}"
+llm_only,syn-12-log-static-message,synthetic,dev,yes,,LOG001,n/a,2.288,"{""answered"": 1}"
+llm_only,syn-13-testcov-no-tests,synthetic,dev,yes,TESTCOV001,SCOPE001,n/a,2.372,"{""answered"": 1}"
+llm_only,syn-14-testcov-with-spec,synthetic,dev,yes,,SCOPE001,n/a,2.334,"{""answered"": 1}"
+llm_only,syn-15-testcov-docs-only,synthetic,dev,yes,,SCOPE001,n/a,1.848,"{""answered"": 1}"
+llm_only,syn-16-scope-unrelated-file,synthetic,dev,yes,SCOPE001,SECRET001,n/a,2.390,"{""answered"": 1}"
+llm_only,syn-17-scope-related-change,synthetic,dev,yes,,SCOPE001,n/a,2.417,"{""answered"": 1}"
+llm_only,syn-18-unreviewable-binary,synthetic,dev,yes,UNREVIEWABLE001,SCOPE001,n/a,1.910,"{""answered"": 1}"
+llm_only,syn-19-unreviewable-pure-rename,synthetic,dev,yes,UNREVIEWABLE001,SCOPE001,n/a,2.464,"{""answered"": 1}"
+llm_only,syn-20-clean-change,synthetic,dev,yes,,AUTH001;SECRET001,n/a,2.585,"{""answered"": 1}"
+hybrid,gh-1600822305__AetherLink-265,real,dev,yes,TESTCOV001,TESTCOV001,approve,3.824,"{""confirmed_risky"": 1}"
+hybrid,gh-AICMO__Autonomous-Agent-X-Bluesky-3428,real,dev,yes,,,approve,0.004,{}
+hybrid,gh-AICMO__Autonomous-Agent-X-Bluesky-3429,real,dev,yes,,,approve,0.004,{}
+hybrid,gh-Apolloccrypt__paramant-relay-261,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-AtomicBot-ai__Atomic-Chat-143,real,dev,yes,TESTCOV001,TESTCOV001,approve,0.001,"{""possible_prompt_injection"": 1}"
+hybrid,gh-BerriAI__litellm-31778,real,dev,yes,,,approve,0.007,{}
+hybrid,gh-BerriAI__litellm-31784,real,dev,yes,,SECRET001,review,0.002,"{""not_eligible_critical"": 1}"
+hybrid,gh-Crossmint__crossmint-sdk-1962,real,heldout,yes,,,approve,0.005,{}
+hybrid,gh-Fiestaboard__FiestaBoard-1336,real,heldout,yes,,,approve,0.002,{}
+hybrid,gh-Francis1998__agentic-career-search-17,real,heldout,yes,,AUTH001,approve,2.667,"{""confirmed_risky"": 1}"
+hybrid,gh-Francis1998__nexus-llm-router-19,real,heldout,yes,,,approve,0.001,{}
+hybrid,gh-FriendlyInternet__nuxt-crouton-1044,real,heldout,yes,,,approve,0.001,{}
+hybrid,gh-JGG0sbp66__ohmyblog-60,real,heldout,yes,TESTCOV001,TESTCOV001,approve,2.224,"{""confirmed_risky"": 1}"
+hybrid,gh-KawaYiLab__InterKnot-Web-64,real,heldout,yes,TESTCOV001,,approve,0.001,{}
+hybrid,gh-KawaYiLab__InterKnot-Web-65,real,heldout,yes,,,approve,0.001,{}
+hybrid,gh-MarkusNeusinger__anyplot-9577,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-MetaMask__metamask-mobile-32639,real,dev,yes,,,approve,0.002,{}
+hybrid,gh-NatLabRockies__openstudio-mcp-78,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-PCGen__pcgen-7653,real,dev,yes,SCOPE001,AUTH001,approve,2.050,"{""confirmed_risky"": 1}"
+hybrid,gh-PhantomBot__PhantomBot-3741,real,dev,yes,TESTCOV001,TESTCOV001,approve,2.118,"{""confirmed_risky"": 1}"
+hybrid,gh-PhantomBot__PhantomBot-3743,real,dev,yes,,TESTCOV001,approve,1.592,"{""confirmed_risky"": 1}"
+hybrid,gh-ROCm__rocm-xio-192,real,dev,yes,,TESTCOV001,approve,1.958,"{""confirmed_risky"": 1}"
+hybrid,gh-ZeroPointSix__outlookEmailPlus-88,real,heldout,yes,,SECRET001,review,4.100,"{""confirmed_risky"": 2}"
+hybrid,gh-airbytehq__airbyte-81354,real,heldout,yes,,,approve,0.001,{}
+hybrid,gh-airbytehq__airbyte-81358,real,heldout,yes,,,approve,0.002,{}
+hybrid,gh-asap-protocol__asap-protocol-259,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-baranwang__homebridge-plugin-haier-66,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-baranwang__homebridge-plugin-haier-68,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-beercss__beercss-642,real,dev,yes,TESTCOV001,TESTCOV001,approve,1.733,"{""confirmed_risky"": 1}"
+hybrid,gh-binarywang__WxJava-4060,real,heldout,yes,TESTCOV001,TESTCOV001,approve,3.919,"{""confirmed_risky"": 1}"
+hybrid,gh-blaxel-ai__sandbox-240,real,heldout,yes,,,approve,0.001,{}
+hybrid,gh-dabit3__react-native-ai-73,real,dev,yes,TESTCOV001,TESTCOV001,approve,3.678,"{""confirmed_risky"": 1}"
+hybrid,gh-dfinity__oisy-wallet-13302,real,heldout,yes,,,approve,0.001,{}
+hybrid,gh-dimagi__open-chat-studio-3730,real,heldout,yes,,TESTCOV001,approve,3.487,"{""confirmed_risky"": 1}"
+hybrid,gh-dotnet__runtime-130061,real,heldout,yes,TESTCOV001,AUTH001;TESTCOV001,reject,31.330,"{""confirmed_risky"": 12}"
+hybrid,gh-duckduckgo__autoconsent-1418,real,heldout,yes,,,approve,0.001,{}
+hybrid,gh-electron-forge__electron-forge-docs-261,real,heldout,no,,,approve,0.002,{}
+hybrid,gh-electron-userland__electron-windows-msix-38,real,heldout,yes,TESTCOV001,,approve,0.002,{}
+hybrid,gh-electron__forge-4304,real,dev,yes,TESTCOV001,TESTCOV001,approve,2.705,"{""confirmed_risky"": 1}"
+hybrid,gh-electron__osx-sign-432,real,heldout,yes,,,approve,0.001,{}
+hybrid,gh-electron__rebuild-1290,real,heldout,yes,,,approve,0.001,{}
+hybrid,gh-electron__sheriff-135,real,dev,yes,TESTCOV001,TESTCOV001,approve,4.020,"{""confirmed_risky"": 1}"
+hybrid,gh-electron__windows-installer-607,real,dev,yes,TESTCOV001,TESTCOV001,approve,3.919,"{""malformed_reply"": 1}"
+hybrid,gh-electron__windows-sign-116,real,heldout,yes,,,approve,0.001,{}
+hybrid,gh-fern-api__fern-16826,real,heldout,yes,TESTCOV001,TESTCOV001,approve,4.084,"{""malformed_reply"": 1}"
+hybrid,gh-firecrawl__firecrawl-3930,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-github__gh-aw-42590,real,heldout,yes,SCOPE001,AUTH001,approve,3.428,"{""confirmed_risky"": 1}"
+hybrid,gh-github__gh-aw-42593,real,heldout,yes,,,approve,0.001,{}
+hybrid,gh-harness__mcp-server-509,real,heldout,yes,,AUTH001,approve,3.004,"{""confirmed_risky"": 1}"
+hybrid,gh-harness__mcp-server-510,real,heldout,yes,SCOPE001,AUTH001,approve,3.371,"{""confirmed_risky"": 1}"
+hybrid,gh-itsoltech__canopy-desktop-304,real,heldout,yes,TESTCOV001,TESTCOV001,approve,3.042,"{""confirmed_risky"": 1}"
+hybrid,gh-kentang2017__kintaiyi-43,real,heldout,yes,,TESTCOV001,approve,4.089,"{""confirmed_risky"": 1}"
+hybrid,gh-kentang2017__kintaiyi-44,real,heldout,yes,TESTCOV001,TESTCOV001,approve,4.478,"{""confirmed_risky"": 1}"
+hybrid,gh-kentcdodds__kody-578,real,dev,yes,,AUTH001,reject,9.694,"{""confirmed_risky"": 4}"
+hybrid,gh-libsndfile__libsndfile-1136,real,heldout,yes,TESTCOV001,TESTCOV001,approve,3.072,"{""confirmed_risky"": 1}"
+hybrid,gh-light-curve__light-curve-python-808,real,dev,yes,TESTCOV001,TESTCOV001,approve,2.651,"{""confirmed_risky"": 1}"
+hybrid,gh-lucasew__ts-proxy-256,real,dev,yes,TESTCOV001,TESTCOV001,approve,3.322,"{""confirmed_risky"": 1}"
+hybrid,gh-madara88645__Compiler-911,real,dev,yes,,,approve,0.002,{}
+hybrid,gh-mastra-ai__mastra-18721,real,heldout,yes,,TESTCOV001,approve,2.968,"{""confirmed_risky"": 1}"
+hybrid,gh-mastra-ai__mastra-18735,real,heldout,yes,,,approve,0.006,{}
+hybrid,gh-mattermost__desktop-3880,real,dev,yes,,TESTCOV001,approve,3.661,"{""confirmed_risky"": 1}"
+hybrid,gh-mattermost__mattermost-37320,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-microsoft__FLAML-1566,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-microsoft__mcs-labs-486,real,heldout,yes,,AUTH001,reject,8.197,"{""confirmed_risky"": 2, ""malformed_reply"": 1}"
+hybrid,gh-mweinbach__agent-coworker-192,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-novuhq__novu-11754,real,heldout,no,,AUTH001,reject,84.031,"{""confirmed_risky"": 19, ""malformed_reply"": 1}"
+hybrid,gh-opensanctions__opensanctions-4746,real,heldout,yes,TESTCOV001,TESTCOV001,approve,2.786,"{""confirmed_risky"": 1}"
+hybrid,gh-opsmill__infrahub-9774,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-programmierbar__website-203,real,dev,yes,TESTCOV001,TESTCOV001,approve,3.138,"{""confirmed_risky"": 1}"
+hybrid,gh-randyap8-wq__Micro-Expert-Router-SSD-Streamed-MoE-MER-130,real,dev,yes,,TESTCOV001,approve,4.800,"{""confirmed_risky"": 1}"
+hybrid,gh-rdlabo-dev__ionic-angular-library-7,real,heldout,yes,,,approve,0.002,{}
+hybrid,gh-tdealer01-crypto__tdealer01-crypto-dsg-control-plane-819,real,heldout,yes,,SECRET001,review,5.295,"{""confirmed_risky"": 2}"
+hybrid,gh-ueberdosis__tiptap-docs-879,real,dev,yes,,,approve,0.001,{}
+hybrid,gh-vellum-ai__vellum-assistant-36782,real,dev,yes,,TESTCOV001,approve,2.942,"{""confirmed_risky"": 1}"
+hybrid,gh-vellum-ai__vellum-assistant-36784,real,dev,yes,TESTCOV001,TESTCOV001,approve,3.422,"{""confirmed_risky"": 1}"
+hybrid,gh-yoy123__lmstudio-copilot-provider-26,real,dev,yes,TESTCOV001,TESTCOV001,approve,3.391,"{""confirmed_risky"": 1}"
+hybrid,gh-yuanjian-org__app-1268,real,heldout,yes,,TESTCOV001,approve,3.484,"{""confirmed_risky"": 1}"
+hybrid,gh-yuanjian-org__app-1270,real,heldout,yes,SCOPE001;TESTCOV001,SCOPE001;TESTCOV001;UNREVIEWABLE001,review,9.549,"{""confirmed_risky"": 5}"
+hybrid,syn-01-auth-expiry-removed,synthetic,dev,yes,AUTH001,AUTH001,approve,3.108,"{""confirmed_risky"": 1}"
+hybrid,syn-02-auth-decorator-removed,synthetic,dev,yes,AUTH001,AUTH001,approve,1.892,"{""confirmed_risky"": 1}"
+hybrid,syn-03-auth-admin-check-removed-js,synthetic,dev,yes,AUTH001,AUTH001,approve,1.970,"{""confirmed_risky"": 1}"
+hybrid,syn-04-auth-unrelated-names,synthetic,dev,yes,,,approve,0.001,{}
+hybrid,syn-05-auth-comment-only,synthetic,dev,yes,,,approve,0.001,{}
+hybrid,syn-06-secret-aws-key-id,synthetic,dev,yes,SECRET001,SCOPE001;SECRET001,review,2.247,"{""confirmed_risky"": 1, ""not_eligible_critical"": 1}"
+hybrid,syn-07-secret-db-password,synthetic,dev,yes,SECRET001,SECRET001,approve,1.448,"{""confirmed_risky"": 1}"
+hybrid,syn-08-secret-env-lookup,synthetic,dev,yes,,,approve,0.001,{}
+hybrid,syn-09-secret-public-key,synthetic,dev,yes,,,approve,0.001,{}
+hybrid,syn-10-log-token-fstring,synthetic,dev,yes,LOG001,LOG001,approve,1.646,"{""confirmed_risky"": 1}"
+hybrid,syn-11-log-password-argument,synthetic,dev,yes,LOG001,LOG001,approve,1.475,"{""confirmed_risky"": 1}"
+hybrid,syn-12-log-static-message,synthetic,dev,yes,,,approve,0.001,{}
+hybrid,syn-13-testcov-no-tests,synthetic,dev,yes,TESTCOV001,TESTCOV001,approve,1.684,"{""confirmed_risky"": 1}"
+hybrid,syn-14-testcov-with-spec,synthetic,dev,yes,,,approve,0.001,{}
+hybrid,syn-15-testcov-docs-only,synthetic,dev,yes,,,approve,0.001,{}
+hybrid,syn-16-scope-unrelated-file,synthetic,dev,yes,SCOPE001,SCOPE001,approve,3.043,"{""confirmed_risky"": 2}"
+hybrid,syn-17-scope-related-change,synthetic,dev,yes,,,approve,0.001,{}
+hybrid,syn-18-unreviewable-binary,synthetic,dev,yes,UNREVIEWABLE001,UNREVIEWABLE001,approve,2.261,"{""confirmed_risky"": 1}"
+hybrid,syn-19-unreviewable-pure-rename,synthetic,dev,yes,UNREVIEWABLE001,TESTCOV001;UNREVIEWABLE001,approve,3.553,"{""confirmed_risky"": 2}"
+hybrid,syn-20-clean-change,synthetic,dev,yes,,,approve,0.001,{}

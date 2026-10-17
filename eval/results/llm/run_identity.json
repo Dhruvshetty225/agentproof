@@ -1,0 +1,20 @@
+{
+  "model": "qwen2.5-coder:1.5b",
+  "model_digest": "d7372fd828518a4d38b1eb196c673c31a85f2ed302b3d1e406c4c2d1b64a0668",
+  "ollama_version": "0.20.6",
+  "agentproof_commit": "aafd795839135f67f1a99a1212da27570eaecd36",
+  "options": {
+    "temperature": 0,
+    "seed": 0,
+    "num_ctx": 4096
+  },
+  "timeout_seconds": 120.0,
+  "limits": {
+    "max_context_lines": 20,
+    "max_excerpt_chars": 4000,
+    "max_task_chars": 1000,
+    "max_diff_chars": 8000
+  },
+  "labels_sha256": "fecfb57bc43de636e44be45127a24e1bcc5cc2e2065045d352c0d038c59af61f",
+  "split_sha256": "8ba0b07cf5046a0ea01fce3ff004755f56d1581828617a39cc9da463f9186ccc"
+}
