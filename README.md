@@ -265,9 +265,10 @@ billing pages before relying on them):
   Code Security or GitHub Advanced Security, which are paid products. Drop
   that step if you don't have them; the artifact upload still works.
 
-Nothing here runs automatically in this repository: the example lives in
-`examples/`, not `.github/workflows/`. The action was run once on a
-GitHub-hosted runner, in test pull request
+This repository runs the action on its own pull requests to `main`, with
+`.github/workflows/agentproof.yml` (the example above, pinned to commit
+`7828f89` of this repository). Its first run on a GitHub-hosted runner was
+test pull request
 [#1](https://github.com/Dhruvshetty225/agentproof/pull/1)
 ([run 39000721919](https://github.com/Dhruvshetty225/agentproof/actions/runs/39000721919)):
 it installed AgentProof, audited the pull request (no findings, APPROVE)

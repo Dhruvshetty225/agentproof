@@ -1,7 +1,8 @@
 # Example workflow for another repository: audit every pull request with AgentProof.
 #
 # Copy this file to .github/workflows/agentproof.yml in the repository you want
-# to audit. It lives in examples/ here so it never runs in this repository.
+# to audit. This file in examples/ never runs; this repository runs its own
+# pinned copy, .github/workflows/agentproof.yml.
 #
 # Before using it:
 # * Replace <commit-sha> with a reviewed commit of the AgentProof repository.
