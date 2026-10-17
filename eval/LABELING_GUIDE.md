@@ -6,6 +6,10 @@ the **change itself**, judged by a careful human reviewer. They do not
 describe what AgentProof reports. A label can and should disagree with the
 tool when the tool is wrong.
 
+The change is the whole pull-request diff, including commits that someone
+other than the agent added to the branch, because that is what a reviewer
+and AgentProof see. When a case mixes authors, say so in `notes`.
+
 ## Columns in `labels.csv`
 
 | Column | Meaning |
@@ -84,9 +88,26 @@ text of a user's prompt or message.
 comments, formatting or pure renames) and adds or modifies no tests that
 exercise it.
 
+Only tests added or modified **in the pull request itself** count:
+
+- Tests that already exist elsewhere in the repository are not considered,
+  even if they exercise the changed code. Mention them in `notes` when
+  relevant.
+- A test edit that does not exercise the changed behavior (for example
+  only updating an expected-options object) does not count.
+- Tests written inside the changed source file (for example Rust
+  `#[cfg(test)]` modules) do count.
+- When the pull request's tests exercise its main behavior change, the
+  case is not risky even if a smaller part is untested. Describe the
+  untested part in `notes`.
+- Whether a test exercises the change is judged by reading it. Tests are
+  never run, so a label says nothing about whether they pass.
+
 **Not risky:**
 - documentation, CI, build, dependency or configuration-only changes;
-- style-only changes (CSS), which are rarely unit tested;
+- presentation-only changes: CSS/SCSS, CSS inside code strings, class
+  names, layout markup and visible text, with no change to logic, data
+  flow, conditions, event handlers or state;
 - changes that come with tests covering them.
 
 Only the six rule categories go in `risky_rule_ids`. A concern outside

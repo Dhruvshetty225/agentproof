@@ -9,9 +9,15 @@ index c35bcfb..a70b074 100644
 +  res.render('admin', { name: req.user.profile?.name ?? 'unknown' });
  });
 diff --git a/routes/admin.test.js b/routes/admin.test.js
-index f2cac44..6983eb2 100644
+index 21ddefc..a487fa3 100644
 --- a/routes/admin.test.js
 +++ b/routes/admin.test.js
-@@ -1 +1,2 @@
- test('renders', () => {});
-+test('renders without profile', () => {});
+@@ -5,3 +5,8 @@ test('renders the dashboard', async () => {
+   const res = await request(app).get('/admin').set('x-test-user', 'admin');
+   expect(res.status).toBe(200);
+ });
++
++test('renders without profile', async () => {
++  const res = await request(app).get('/admin').set('x-test-user', 'no-profile');
++  expect(res.text).toContain('unknown');
++});

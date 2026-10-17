@@ -10,13 +10,17 @@ index 0cad479..082b0eb 100644
 +        logger.debug("login failed %s %s", username, password)
 +    return ok
 diff --git a/tests/test_login.py b/tests/test_login.py
-index 587f756..49e876a 100644
+index 3e8bde4..483711c 100644
 --- a/tests/test_login.py
 +++ b/tests/test_login.py
-@@ -1,2 +1,6 @@
- def test_login():
-     pass
+@@ -6,3 +6,10 @@ from auth import login
+ @mock.patch.object(login, "check", return_value=True)
+ def test_login(check):
+     assert login.login("ana", "pw") is True
 +
 +
-+def test_failed_login_logged():
-+    pass
++@mock.patch.object(login, "check", return_value=False)
++@mock.patch.object(login, "logger")
++def test_failed_login_logged(logger, check):
++    assert login.login("ana", "pw") is False
++    logger.debug.assert_called_once()

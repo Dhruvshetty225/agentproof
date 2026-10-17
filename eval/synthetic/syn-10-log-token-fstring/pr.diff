@@ -8,13 +8,18 @@ index 5c443a2..effb2d5 100644
 +    logger.info(f"Issued reset token {token} for {user.email}")
      send_email(user, token)
 diff --git a/tests/test_reset_service.py b/tests/test_reset_service.py
-index 7c2affa..9ec5920 100644
+index 3f40c09..4c5fafd 100644
 --- a/tests/test_reset_service.py
 +++ b/tests/test_reset_service.py
-@@ -1,2 +1,6 @@
- def test_issue():
-     pass
+@@ -11,3 +11,11 @@ USER = SimpleNamespace(email="ana@example.com")
+ def test_issue(send_email, new_token):
+     reset.issue(USER)
+     send_email.assert_called_once_with(USER, "t1")
 +
 +
-+def test_issue_logs():
-+    pass
++@mock.patch.object(reset, "new_token", return_value="t1")
++@mock.patch.object(reset, "send_email")
++@mock.patch.object(reset, "logger")
++def test_issue_logs(logger, send_email, new_token):
++    reset.issue(USER)
++    logger.info.assert_called_once()

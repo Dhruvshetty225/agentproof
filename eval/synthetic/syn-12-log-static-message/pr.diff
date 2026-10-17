@@ -7,13 +7,17 @@ index b88dad6..feca8a0 100644
      deliver(user.email, 'reset')
 +    logger.info("Password reset email sent to user %s", user.id)
 diff --git a/tests/test_mailer.py b/tests/test_mailer.py
-index c3aeac2..4079620 100644
+index 6a3a75f..ef39f28 100644
 --- a/tests/test_mailer.py
 +++ b/tests/test_mailer.py
-@@ -1,2 +1,6 @@
- def test_send():
-     pass
+@@ -10,3 +10,10 @@ USER = SimpleNamespace(id=7, email="ana@example.com")
+ def test_send(deliver):
+     mailer.send_reset(USER)
+     deliver.assert_called_once_with("ana@example.com", "reset")
 +
 +
-+def test_send_logs():
-+    pass
++@mock.patch.object(mailer, "deliver")
++@mock.patch.object(mailer, "logger")
++def test_send_logs(logger, deliver):
++    mailer.send_reset(USER)
++    logger.info.assert_called_once_with("Password reset email sent to user %s", 7)

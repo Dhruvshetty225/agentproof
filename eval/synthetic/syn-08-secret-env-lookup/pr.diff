@@ -8,13 +8,16 @@ index 0f0a37d..68908d3 100644
 +
 +DB_PASSWORD = os.environ["DB_PASSWORD"]
 diff --git a/tests/test_settings.py b/tests/test_settings.py
-index 85d5dd2..0891544 100644
+index c64653a..adc7851 100644
 --- a/tests/test_settings.py
 +++ b/tests/test_settings.py
-@@ -1,2 +1,6 @@
- def test_password():
-     pass
+@@ -5,3 +5,9 @@ from settings import production
+ 
+ def test_password_is_set():
+     assert production.DB_PASSWORD
 +
 +
-+def test_password_from_env():
-+    pass
++def test_password_from_env(monkeypatch):
++    monkeypatch.setenv("DB_PASSWORD", "value-from-env")
++    importlib.reload(production)
++    assert production.DB_PASSWORD == "value-from-env"

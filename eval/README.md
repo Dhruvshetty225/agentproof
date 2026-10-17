@@ -4,8 +4,8 @@ This folder holds the data used to evaluate AgentProof's rules:
 
 - **78 real pull requests** authored by AI coding agents on public GitHub;
 - **20 synthetic cases**, written by hand to exercise each rule;
-- **tentative labels** for every case, which a human reviewer must still
-  confirm or correct before any metric is computed.
+- **human-reviewed labels** for every case: tentative labels were drafted
+  first, then a human reviewer confirmed or corrected every row.
 
 Every number below is printed by:
 
@@ -27,7 +27,7 @@ That command only reads committed files (`manifest.csv`,
 | `collection_report.json` | Totals and exclusions for the final collection run | yes |
 | `collection_report_run1.json` | Report of the first run (12 per agent), kept for transparency | yes |
 | `make_synthetic.py`, `synthetic/` | The 20 synthetic cases and the script that generates them | yes |
-| `labels.csv` | Tentative labels (all `needs_review`) | yes |
+| `labels.csv` | Reviewed labels (each row `confirmed` or `corrected`) | yes |
 | `LABELING_GUIDE.md` | Definition of "risky" for each rule | yes |
 | `data/real/<case_id>/` | `metadata.json` (incl. PR description) and `pr.diff` for each real case | **no** (see below) |
 
@@ -143,6 +143,15 @@ examples:
 | UNREVIEWABLE001 | syn-18, 19 | (all others) |
 | none | | syn-20 (clean change) |
 
+When a case adds a test, the test calls the code the case changes and
+makes meaningful assertions about it, so on reading it counts as a test of
+that change under the labeling guide. These embedded tests have **not been
+executed**. Several synthetic source files are fragments (for example they
+use `logger` without defining it), so the tests are not expected to run as
+written. The project's own tests (`tests/test_eval_synthetic.py`) only
+check that the committed files match the generator; they do not show that
+the embedded tests run or pass.
+
 They were designed with knowledge of how the rules work, so they show
 whether the rules behave as intended. They do not show how well the rules
 work on real code.
@@ -154,29 +163,48 @@ work on real code.
 The meaning of each rule's risk is defined in
 [`LABELING_GUIDE.md`](LABELING_GUIDE.md).
 
-**All labels are tentative.** Every row is `needs_review`; only rows marked
-`confirmed` or `corrected` by the human reviewer may be used for precision,
-recall or F1. The tentative labels were made by reading each PR's title,
-description and diff, *without* running AgentProof on it first. Each row's
-`notes` explains the reasoning, and 8 real cases are marked `UNCERTAIN:`.
+**How the labels were made.** Tentative labels were first drafted by
+reading each PR's title, description and diff, *without* running AgentProof
+on it first. A human reviewer then went through every row, looked at the
+evidence, and set it to `confirmed` (label kept) or `corrected` (label
+changed). Only `confirmed` and `corrected` rows may be used for precision,
+recall or F1. Each row's `notes` explains the reasoning.
 
-Tentative counts (not results):
+The review settled several judgment calls, which are now written into the
+guide:
+
+- the label covers the whole PR diff, including commits pushed by someone
+  other than the agent;
+- for TESTCOV001, only tests added or changed in the PR count, and a test
+  edit must exercise the change;
+- a PR whose tests cover its main change is not TESTCOV001, even if a
+  smaller part is untested;
+- presentation-only changes (CSS, class names, layout markup, visible text)
+  do not need tests;
+- behavior-preserving refactors still do;
+- a PR description that is out of date but still serves the title's goal
+  is not SCOPE001.
+
+Label counts (these describe the dataset; they are not results):
 
 | | Real (78) | Synthetic (20) |
 |---|---|---|
-| `is_risky = 1` | 28 | 11 |
+| `is_risky = 1` | 27 | 11 |
 | AUTH001 | 0 | 3 |
 | SECRET001 | 0 | 2 |
 | LOG001 | 0 | 2 |
 | TESTCOV001 | 24 | 1 |
-| SCOPE001 | 5 | 1 |
+| SCOPE001 | 4 | 1 |
 | UNREVIEWABLE001 | 0 | 2 |
+| `confirmed` | 77 | 20 |
+| `corrected` | 1 | 0 |
+| `needs_review` | 0 | 0 |
 
-None of the 78 real PRs was tentatively labeled with a security concern
-(AUTH001, SECRET001, LOG001). Unless review changes that, recall for those
-rules cannot be measured on real data (no positive examples). The real
-data can still show false positives, and the synthetic cases are the only
-positives for those rules.
+None of the 78 real PRs has a security concern (AUTH001, SECRET001,
+LOG001) after review. Recall for those rules therefore cannot be measured
+on real data (there are no positive examples). The real data can still
+show false positives, and the synthetic cases are the only positives for
+those rules.
 
 Some real PRs raise concerns outside the six rule categories, such as a
 possible path traversal, removed supply-chain pinning or deleted tests.
@@ -202,9 +230,10 @@ These are described in `notes` and are not counted as rule positives.
 - **PR descriptions can be inaccurate.** Several descriptions do not match
   their diffs (noted in `labels.csv`); SCOPE001 uses the description as the
   task, so this affects that rule.
-- **Single tentative labeler.** Labels reflect one reading of each case and
-  need independent review; judgment calls (for example whether a style-only
-  change needs tests) are documented in the guide and notes.
+- **One reviewer.** Every label was reviewed by one human reviewer; there
+  was no second, independent reviewer, so no inter-rater agreement can be
+  reported. Judgment calls (for example whether a presentation-only change
+  needs tests) are documented in the guide and notes.
 - **Untrusted content.** Titles, descriptions and diffs are third-party
   text. Nothing collected is executed, and text in them is treated as data,
   never as instructions.

@@ -6,13 +6,14 @@ index 9272530..eca6f1c 100644
  BUCKET = 'avatars'
 +AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"
 diff --git a/tests/test_storage.py b/tests/test_storage.py
-index 10d5898..76f8172 100644
+index ac65500..4d916f8 100644
 --- a/tests/test_storage.py
 +++ b/tests/test_storage.py
-@@ -1,2 +1,6 @@
+@@ -3,3 +3,7 @@ from config import storage
+ 
  def test_bucket():
-     pass
+     assert storage.BUCKET == "avatars"
 +
 +
-+def test_upload():
-+    pass
++def test_upload_key_is_configured():
++    assert storage.AWS_ACCESS_KEY_ID.startswith("AKIA")

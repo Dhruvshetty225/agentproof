@@ -3,8 +3,10 @@
     python -m eval.summarize_dataset
 
 Reads eval/manifest.csv, eval/collection_report.json and eval/labels.csv.
-Label counts are TENTATIVE until each row's review_status is confirmed or
-corrected; they are not ground truth and are not evaluation results.
+Label counts cover every row; the review_status counts show how many rows a
+human reviewer has confirmed or corrected. Rows still marked needs_review are
+not ground truth. Label counts describe the dataset; they are not evaluation
+results.
 """
 
 from __future__ import annotations
@@ -69,7 +71,7 @@ def main(eval_dir: Path = EVAL_DIR) -> int:
     output = {
         "manifest": manifest_summary(_read_csv(eval_dir / "manifest.csv")),
         "collection": collection_summary(report),
-        "tentative_labels": label_summary(_read_csv(eval_dir / "labels.csv")),
+        "labels": label_summary(_read_csv(eval_dir / "labels.csv")),
     }
     json.dump(output, sys.stdout, indent=2)
     print()

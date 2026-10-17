@@ -13,13 +13,18 @@ index 398ab80..fd55829 100644
 +            backoff(attempt)
 +    raise RetryError(url)
 diff --git a/tests/test_client.py b/tests/test_client.py
-index 0e6766c..90d20d1 100644
+index 7b78c17..624f671 100644
 --- a/tests/test_client.py
 +++ b/tests/test_client.py
-@@ -1,2 +1,6 @@
- def test_get():
-     pass
+@@ -7,3 +7,11 @@ from http import client
+ def test_get(session):
+     session.get.return_value = "ok"
+     assert client.get("https://example.com") == "ok"
 +
 +
-+def test_retry_backoff():
-+    pass
++@mock.patch.object(client, "backoff")
++@mock.patch.object(client, "session")
++def test_retry_backoff(session, backoff):
++    session.get.side_effect = [client.TransientError(), "ok"]
++    assert client.get("https://example.com") == "ok"
++    backoff.assert_called_once_with(0)

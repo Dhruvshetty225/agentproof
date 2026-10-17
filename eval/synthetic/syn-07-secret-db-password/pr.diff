@@ -8,13 +8,14 @@ index b7b4885..145f353 100644
 +DB_HOST = 'new-db.internal'
 +DB_PASSWORD = "Winter2026!fake"
 diff --git a/tests/test_settings.py b/tests/test_settings.py
-index a67b659..778e035 100644
+index 21d55c6..af661af 100644
 --- a/tests/test_settings.py
 +++ b/tests/test_settings.py
-@@ -1,2 +1,6 @@
+@@ -3,3 +3,7 @@ from settings import production
+ 
  def test_host():
-     pass
+     assert production.DB_HOST.endswith(".internal")
 +
 +
 +def test_new_host():
-+    pass
++    assert production.DB_HOST == "new-db.internal"

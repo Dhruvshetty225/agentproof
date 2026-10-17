@@ -13,13 +13,14 @@ index 1908206..206a059 100644
 -You will recieve a confirmation shortly.
 +You will receive a confirmation shortly.
 diff --git a/tests/test_rates.py b/tests/test_rates.py
-index 98af0ee..2558fd1 100644
+index b35b28e..d35842e 100644
 --- a/tests/test_rates.py
 +++ b/tests/test_rates.py
-@@ -1,2 +1,6 @@
+@@ -3,3 +3,7 @@ from billing.rates import TAX_RATE
+ 
  def test_rate():
-     pass
+     assert 0 <= TAX_RATE < 1
 +
 +
 +def test_lower_rate():
-+    pass
++    assert TAX_RATE == 0.15

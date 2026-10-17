@@ -10,13 +10,16 @@ index 9f38943..9218779 100644
 +    num_tokens = len(model.tokenizer(doc.text))
      return doc.author, num_tokens
 diff --git a/tests/test_attribution.py b/tests/test_attribution.py
-index b7a6e94..d3bd4ca 100644
+index f373e4a..85e6ce8 100644
 --- a/tests/test_attribution.py
 +++ b/tests/test_attribution.py
-@@ -1,2 +1,6 @@
- def test_attribute():
-     pass
+@@ -7,3 +7,9 @@ def test_attribute():
+     doc = SimpleNamespace(author="ana", text="a b c")
+     model = SimpleNamespace(tokenizer=str.split)
+     assert attribute(doc, model) == ("ana", 3)
 +
 +
 +def test_attribute_empty():
-+    pass
++    doc = SimpleNamespace(author="ana", text="")
++    model = SimpleNamespace(tokenizer=str.split)
++    assert attribute(doc, model) == ("ana", 0)

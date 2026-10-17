@@ -12,13 +12,15 @@ index 5c47289..6856c98 100644
  
  
 diff --git a/tests/test_reset.py b/tests/test_reset.py
-index 2beb715..4b731b3 100644
+index 22a0b2a..f61dfcd 100644
 --- a/tests/test_reset.py
 +++ b/tests/test_reset.py
-@@ -1,2 +1,6 @@
- def test_unknown_token():
-     pass
+@@ -7,3 +7,8 @@ from backend.reset import validate_reset_token
+ def test_valid_token():
+     link = SimpleNamespace(user_id=7, expires_at=time.time() + 60)
+     assert validate_reset_token({"abc": link}, "abc") == 7
 +
 +
-+def test_valid_token():
-+    pass
++def test_old_link_still_works():
++    link = SimpleNamespace(user_id=7, expires_at=0)
++    assert validate_reset_token({"abc": link}, "abc") == 7
