@@ -99,6 +99,16 @@ brew uninstall ollama
 Download sizes and licenses are as listed on ollama.com on 2026-10-16. The
 "expected fit" column is a judgment, not a measurement.
 
+**What happened with 7B on this Mac (2026-10-16).**
+
+- A 5-case check finished (`eval/results/llm-smoke/`; 5 development cases,
+  so too few for any accuracy claim).
+- The full run froze the Mac twice. Swap use reached about 7.6 GB, and the
+  Mac had to be force-restarted with the power button during case 13 of 98.
+  The Ollama log shows no error before the freeze.
+- The full benchmark therefore uses `qwen2.5-coder:1.5b` instead, reported
+  as a fallback to a weaker model.
+
 ## Usage
 
 ```bash
@@ -141,6 +151,29 @@ time are still real costs.
 
 If Ollama is not running or the model is not downloaded, the command
 prints "Benchmark not run" and writes nothing.
+
+**Saving and resuming:**
+
+- Each finished case is saved at once to `records.jsonl`, so a crash loses
+  at most the case in progress.
+- Rerunning the same command resumes after the saved cases. It refuses if
+  the model, its digest, the Ollama version, the commit or the labels
+  changed.
+- After 3 cases in a row whose model call failed, the run stops cleanly.
+- `--report-only` writes the report from the saved cases without contacting
+  Ollama, and marks it PARTIAL with every unprocessed case listed.
+
+**What is scored:**
+
+- All three modes are scored on the same cases: those whose LLM-only call
+  returned a valid answer.
+- A case whose LLM-only call failed is excluded from every mode and listed
+  by name; it is never counted as "nothing risky".
+- `coverage.json` and `comparison.md` count how every model call ended:
+  - model decisions;
+  - findings kept by policy (critical findings);
+  - findings kept by the injection check;
+  - failures.
 
 The tests (`tests/test_llm_verify.py`, `tests/test_llm_ollama_http.py`,
 `tests/test_eval_llm.py`) use a fake model and a fake Ollama server. They

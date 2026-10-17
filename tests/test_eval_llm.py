@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from agentproof.llm_verify import LLMUnavailable
+from agentproof.llm_verify import LLMTimeout, LLMUnavailable
 from eval import run_llm_eval
 from eval.make_synthetic import CASES, OUT_DIR
 from eval.metrics import RULES
@@ -100,3 +100,112 @@ def test_benchmark_is_not_run_without_the_model(tmp_path, capsys):
     client.model_info = lambda: {}
     assert run_llm_eval.main(["--results-dir", str(tmp_path / "llm")], client=client) == 2
     assert "is not downloaded" in capsys.readouterr().err
+
+
+# --- saving, resuming and honest coverage ------------------------------------------------
+
+
+def _llm_only_calls(client):
+    return sum("<untrusted_diff>" in prompt for prompt in client.prompts)
+
+
+@pytest.fixture
+def five_cases(monkeypatch):
+    monkeypatch.setattr(run_llm_eval, "load_cases", lambda: (_synthetic_cases(), 0))
+
+
+def test_each_case_is_saved_and_a_rerun_resumes(tmp_path, five_cases):
+    results = tmp_path / "llm"
+    first = ScriptedClient()
+    assert run_llm_eval.main(["--results-dir", str(results), "--limit", "3"], client=first) == 0
+    assert len((results / "records.jsonl").read_text().splitlines()) == 3
+    second = ScriptedClient()
+    assert run_llm_eval.main(["--results-dir", str(results)], client=second) == 0
+    assert _llm_only_calls(second) == 2  # only the two cases not saved yet
+    assert len((results / "records.jsonl").read_text().splitlines()) == 5
+    cover = json.loads((results / "coverage.json").read_text())
+    assert (cover["processed"], cover["scored"], cover["not_processed"]) == (5, 5, [])
+    assert len(json.loads((results / "environment.json").read_text())["warmups"]) == 2
+
+
+def test_saved_cases_from_other_settings_are_never_mixed_in(tmp_path, five_cases):
+    results = tmp_path / "llm"
+    assert run_llm_eval.main(["--results-dir", str(results), "--limit", "2"], client=ScriptedClient()) == 0
+    saved = (results / "records.jsonl").read_text()
+    other_model = ScriptedClient()
+    other_model.model = "other-model:1b"
+    assert run_llm_eval.main(["--results-dir", str(results)], client=other_model) == 2
+    assert other_model.prompts == []
+    assert (results / "records.jsonl").read_text() == saved
+
+
+def test_an_incomplete_last_line_is_ignored_and_that_case_runs_again(tmp_path, five_cases):
+    results = tmp_path / "llm"
+    assert run_llm_eval.main(["--results-dir", str(results), "--limit", "2"], client=ScriptedClient()) == 0
+    with open(results / "records.jsonl", "a", encoding="utf-8") as handle:
+        handle.write('{"case_id": "syn-03-auth-admin-check-re')  # cut off by a crash
+    client = ScriptedClient()
+    assert run_llm_eval.main(["--results-dir", str(results)], client=client) == 0
+    assert _llm_only_calls(client) == 3
+
+
+class TimeoutOnLogin(ScriptedClient):
+    """The LLM-only call times out on the login_required case."""
+
+    def generate(self, system, prompt, schema):
+        if "<untrusted_diff>" in prompt and "login_required" in prompt:
+            self.prompts.append(prompt)
+            raise LLMTimeout("no answer within 5 s")
+        return super().generate(system, prompt, schema)
+
+
+def test_a_failed_llm_only_call_is_excluded_from_every_mode_and_listed(tmp_path, five_cases):
+    results = tmp_path / "llm"
+    assert run_llm_eval.main(["--results-dir", str(results)], client=TimeoutOnLogin()) == 0
+    cover = json.loads((results / "coverage.json").read_text())
+    assert cover["excluded_llm_only_failed"] == {"syn-02-auth-decorator-removed": "timeout"}
+    assert (cover["processed"], cover["scored"]) == (5, 4)
+    metrics = json.loads((results / "metrics.json").read_text())
+    for mode in ("rules", "llm_only", "hybrid"):
+        assert metrics[mode]["synthetic"]["all"]["any_finding"]["cases"] == 4
+    # The rules still found the other two removed checks; the failed case is not counted either way.
+    assert metrics["rules"]["synthetic"]["all"]["per_rule"]["AUTH001"]["tp"] == 2
+    comparison = (results / "comparison.md").read_text()
+    assert "syn-02-auth-decorator-removed (timeout)" in comparison
+    assert "failure: timeout" in comparison
+
+
+class AlwaysTimesOut(ScriptedClient):
+    def generate(self, system, prompt, schema):
+        if "<untrusted_diff>" in prompt:
+            self.prompts.append(prompt)
+            raise LLMTimeout("no answer within 5 s")
+        return super().generate(system, prompt, schema)
+
+
+def test_repeated_failures_stop_the_run_and_keep_finished_cases(tmp_path, five_cases):
+    results = tmp_path / "llm"
+    assert run_llm_eval.main(["--results-dir", str(results)], client=AlwaysTimesOut()) == 3
+    assert len((results / "records.jsonl").read_text().splitlines()) == 3
+    cover = json.loads((results / "coverage.json").read_text())
+    assert len(cover["not_processed"]) == 2 and cover["scored"] == 0
+    assert "PARTIAL RUN: 2 case(s) not processed" in (results / "comparison.md").read_text()
+
+
+def test_report_only_needs_no_model_and_marks_a_partial_run(tmp_path, five_cases):
+    results = tmp_path / "llm"
+    assert run_llm_eval.main(["--results-dir", str(results), "--limit", "2"], client=ScriptedClient()) == 0
+
+    class NoCalls(ScriptedClient):
+        def version(self):
+            raise AssertionError("report-only must not contact the model")
+
+    assert run_llm_eval.main(["--results-dir", str(results), "--report-only"], client=NoCalls()) == 0
+    comparison = (results / "comparison.md").read_text()
+    assert "PARTIAL RUN: 3 case(s) not processed" in comparison
+    assert "not counted as safe" in comparison
+
+
+def test_report_only_without_a_saved_run_says_so(tmp_path, five_cases, capsys):
+    assert run_llm_eval.main(["--results-dir", str(tmp_path / "none"), "--report-only"]) == 2
+    assert "Nothing to report" in capsys.readouterr().err
