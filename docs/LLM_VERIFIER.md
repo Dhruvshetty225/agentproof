@@ -103,8 +103,9 @@ Download sizes and licenses are as listed on ollama.com on 2026-10-16. The
 
 **What happened with 7B on this Mac (2026-10-16).**
 
-- A 5-case check finished (`eval/results/llm-smoke/`; 5 development cases,
-  so too few for any accuracy claim).
+- A 5-case check finished (5 development cases, so too few for any
+  accuracy claim). Its results were kept locally and are not in this
+  repository.
 - While 7B was loaded, swap use reached about 7.6 GB of 8 GB.
 - During the full run the Mac froze at case 13 of 98 and had to be
   force-restarted with the power button. The Ollama log shows no error
