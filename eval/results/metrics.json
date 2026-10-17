@@ -1,0 +1,1012 @@
+{
+  "commits": {
+    "before": "819cbb200640f5753c4c4ca8d5f0bb770ec71889",
+    "after": "ef6883339495a7c31e7a60fb3b5ce9fd106d572b"
+  },
+  "results": {
+    "before": {
+      "real": {
+        "all": {
+          "per_rule": {
+            "AUTH001": {
+              "tp": 0,
+              "fp": 6,
+              "tn": 72,
+              "fn": 0,
+              "cases": 78,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.07692307692307693
+            },
+            "SECRET001": {
+              "tp": 0,
+              "fp": 2,
+              "tn": 76,
+              "fn": 0,
+              "cases": 78,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.02564102564102564
+            },
+            "LOG001": {
+              "tp": 0,
+              "fp": 0,
+              "tn": 78,
+              "fn": 0,
+              "cases": 78,
+              "positives": 0,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0
+            },
+            "TESTCOV001": {
+              "tp": 22,
+              "fp": 20,
+              "tn": 34,
+              "fn": 2,
+              "cases": 78,
+              "positives": 24,
+              "precision": 0.5238095238095238,
+              "recall": 0.9166666666666666,
+              "f1": 0.6666666666666667,
+              "false_positive_rate": 0.37037037037037035
+            },
+            "SCOPE001": {
+              "tp": 1,
+              "fp": 0,
+              "tn": 74,
+              "fn": 3,
+              "cases": 78,
+              "positives": 4,
+              "precision": 1.0,
+              "recall": 0.25,
+              "f1": 0.4,
+              "false_positive_rate": 0.0
+            },
+            "UNREVIEWABLE001": {
+              "tp": 0,
+              "fp": 1,
+              "tn": 77,
+              "fn": 0,
+              "cases": 78,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.01282051282051282
+            }
+          },
+          "security_rules": {
+            "tp": 0,
+            "fp": 8,
+            "tn": 70,
+            "fn": 0,
+            "cases": 78,
+            "positives": 0,
+            "precision": 0.0,
+            "recall": null,
+            "f1": null,
+            "false_positive_rate": 0.10256410256410256
+          },
+          "review_rules": {
+            "tp": 23,
+            "fp": 19,
+            "tn": 32,
+            "fn": 4,
+            "cases": 78,
+            "positives": 27,
+            "precision": 0.5476190476190477,
+            "recall": 0.8518518518518519,
+            "f1": 0.6666666666666667,
+            "false_positive_rate": 0.37254901960784315
+          },
+          "any_finding": {
+            "tp": 24,
+            "fp": 23,
+            "tn": 28,
+            "fn": 3,
+            "cases": 78,
+            "positives": 27,
+            "precision": 0.5106382978723404,
+            "recall": 0.8888888888888888,
+            "f1": 0.6486486486486487,
+            "false_positive_rate": 0.45098039215686275
+          },
+          "review_or_reject": {
+            "tp": 2,
+            "fp": 3,
+            "tn": 48,
+            "fn": 25,
+            "cases": 78,
+            "positives": 27,
+            "precision": 0.4,
+            "recall": 0.07407407407407407,
+            "f1": 0.125,
+            "false_positive_rate": 0.058823529411764705
+          }
+        },
+        "dev": {
+          "per_rule": {
+            "AUTH001": {
+              "tp": 0,
+              "fp": 1,
+              "tn": 37,
+              "fn": 0,
+              "cases": 38,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.02631578947368421
+            },
+            "SECRET001": {
+              "tp": 0,
+              "fp": 1,
+              "tn": 37,
+              "fn": 0,
+              "cases": 38,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.02631578947368421
+            },
+            "LOG001": {
+              "tp": 0,
+              "fp": 0,
+              "tn": 38,
+              "fn": 0,
+              "cases": 38,
+              "positives": 0,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0
+            },
+            "TESTCOV001": {
+              "tp": 13,
+              "fp": 8,
+              "tn": 17,
+              "fn": 0,
+              "cases": 38,
+              "positives": 13,
+              "precision": 0.6190476190476191,
+              "recall": 1.0,
+              "f1": 0.7647058823529412,
+              "false_positive_rate": 0.32
+            },
+            "SCOPE001": {
+              "tp": 0,
+              "fp": 0,
+              "tn": 37,
+              "fn": 1,
+              "cases": 38,
+              "positives": 1,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0
+            },
+            "UNREVIEWABLE001": {
+              "tp": 0,
+              "fp": 0,
+              "tn": 38,
+              "fn": 0,
+              "cases": 38,
+              "positives": 0,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0
+            }
+          },
+          "security_rules": {
+            "tp": 0,
+            "fp": 2,
+            "tn": 36,
+            "fn": 0,
+            "cases": 38,
+            "positives": 0,
+            "precision": 0.0,
+            "recall": null,
+            "f1": null,
+            "false_positive_rate": 0.05263157894736842
+          },
+          "review_rules": {
+            "tp": 13,
+            "fp": 8,
+            "tn": 16,
+            "fn": 1,
+            "cases": 38,
+            "positives": 14,
+            "precision": 0.6190476190476191,
+            "recall": 0.9285714285714286,
+            "f1": 0.742857142857143,
+            "false_positive_rate": 0.3333333333333333
+          },
+          "any_finding": {
+            "tp": 13,
+            "fp": 9,
+            "tn": 15,
+            "fn": 1,
+            "cases": 38,
+            "positives": 14,
+            "precision": 0.5909090909090909,
+            "recall": 0.9285714285714286,
+            "f1": 0.7222222222222223,
+            "false_positive_rate": 0.375
+          },
+          "review_or_reject": {
+            "tp": 0,
+            "fp": 2,
+            "tn": 22,
+            "fn": 14,
+            "cases": 38,
+            "positives": 14,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "false_positive_rate": 0.08333333333333333
+          }
+        },
+        "heldout": {
+          "per_rule": {
+            "AUTH001": {
+              "tp": 0,
+              "fp": 5,
+              "tn": 35,
+              "fn": 0,
+              "cases": 40,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.125
+            },
+            "SECRET001": {
+              "tp": 0,
+              "fp": 1,
+              "tn": 39,
+              "fn": 0,
+              "cases": 40,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.025
+            },
+            "LOG001": {
+              "tp": 0,
+              "fp": 0,
+              "tn": 40,
+              "fn": 0,
+              "cases": 40,
+              "positives": 0,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0
+            },
+            "TESTCOV001": {
+              "tp": 9,
+              "fp": 12,
+              "tn": 17,
+              "fn": 2,
+              "cases": 40,
+              "positives": 11,
+              "precision": 0.42857142857142855,
+              "recall": 0.8181818181818182,
+              "f1": 0.5625,
+              "false_positive_rate": 0.41379310344827586
+            },
+            "SCOPE001": {
+              "tp": 1,
+              "fp": 0,
+              "tn": 37,
+              "fn": 2,
+              "cases": 40,
+              "positives": 3,
+              "precision": 1.0,
+              "recall": 0.3333333333333333,
+              "f1": 0.5,
+              "false_positive_rate": 0.0
+            },
+            "UNREVIEWABLE001": {
+              "tp": 0,
+              "fp": 1,
+              "tn": 39,
+              "fn": 0,
+              "cases": 40,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.025
+            }
+          },
+          "security_rules": {
+            "tp": 0,
+            "fp": 6,
+            "tn": 34,
+            "fn": 0,
+            "cases": 40,
+            "positives": 0,
+            "precision": 0.0,
+            "recall": null,
+            "f1": null,
+            "false_positive_rate": 0.15
+          },
+          "review_rules": {
+            "tp": 10,
+            "fp": 11,
+            "tn": 16,
+            "fn": 3,
+            "cases": 40,
+            "positives": 13,
+            "precision": 0.47619047619047616,
+            "recall": 0.7692307692307693,
+            "f1": 0.588235294117647,
+            "false_positive_rate": 0.4074074074074074
+          },
+          "any_finding": {
+            "tp": 11,
+            "fp": 14,
+            "tn": 13,
+            "fn": 2,
+            "cases": 40,
+            "positives": 13,
+            "precision": 0.44,
+            "recall": 0.8461538461538461,
+            "f1": 0.5789473684210525,
+            "false_positive_rate": 0.5185185185185185
+          },
+          "review_or_reject": {
+            "tp": 2,
+            "fp": 1,
+            "tn": 26,
+            "fn": 11,
+            "cases": 40,
+            "positives": 13,
+            "precision": 0.6666666666666666,
+            "recall": 0.15384615384615385,
+            "f1": 0.25,
+            "false_positive_rate": 0.037037037037037035
+          }
+        }
+      },
+      "synthetic": {
+        "all": {
+          "per_rule": {
+            "AUTH001": {
+              "tp": 1,
+              "fp": 1,
+              "tn": 16,
+              "fn": 2,
+              "cases": 20,
+              "positives": 3,
+              "precision": 0.5,
+              "recall": 0.3333333333333333,
+              "f1": 0.4,
+              "false_positive_rate": 0.058823529411764705
+            },
+            "SECRET001": {
+              "tp": 0,
+              "fp": 0,
+              "tn": 18,
+              "fn": 2,
+              "cases": 20,
+              "positives": 2,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0
+            },
+            "LOG001": {
+              "tp": 2,
+              "fp": 1,
+              "tn": 17,
+              "fn": 0,
+              "cases": 20,
+              "positives": 2,
+              "precision": 0.6666666666666666,
+              "recall": 1.0,
+              "f1": 0.8,
+              "false_positive_rate": 0.05555555555555555
+            },
+            "TESTCOV001": {
+              "tp": 1,
+              "fp": 3,
+              "tn": 16,
+              "fn": 0,
+              "cases": 20,
+              "positives": 1,
+              "precision": 0.25,
+              "recall": 1.0,
+              "f1": 0.4,
+              "false_positive_rate": 0.15789473684210525
+            },
+            "SCOPE001": {
+              "tp": 1,
+              "fp": 1,
+              "tn": 18,
+              "fn": 0,
+              "cases": 20,
+              "positives": 1,
+              "precision": 0.5,
+              "recall": 1.0,
+              "f1": 0.6666666666666666,
+              "false_positive_rate": 0.05263157894736842
+            },
+            "UNREVIEWABLE001": {
+              "tp": 2,
+              "fp": 0,
+              "tn": 18,
+              "fn": 0,
+              "cases": 20,
+              "positives": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "false_positive_rate": 0.0
+            }
+          },
+          "security_rules": {
+            "tp": 3,
+            "fp": 2,
+            "tn": 11,
+            "fn": 4,
+            "cases": 20,
+            "positives": 7,
+            "precision": 0.6,
+            "recall": 0.42857142857142855,
+            "f1": 0.5,
+            "false_positive_rate": 0.15384615384615385
+          },
+          "review_rules": {
+            "tp": 4,
+            "fp": 3,
+            "tn": 13,
+            "fn": 0,
+            "cases": 20,
+            "positives": 4,
+            "precision": 0.5714285714285714,
+            "recall": 1.0,
+            "f1": 0.7272727272727273,
+            "false_positive_rate": 0.1875
+          },
+          "any_finding": {
+            "tp": 9,
+            "fp": 3,
+            "tn": 6,
+            "fn": 2,
+            "cases": 20,
+            "positives": 11,
+            "precision": 0.75,
+            "recall": 0.8181818181818182,
+            "f1": 0.7826086956521738,
+            "false_positive_rate": 0.3333333333333333
+          },
+          "review_or_reject": {
+            "tp": 1,
+            "fp": 1,
+            "tn": 8,
+            "fn": 10,
+            "cases": 20,
+            "positives": 11,
+            "precision": 0.5,
+            "recall": 0.09090909090909091,
+            "f1": 0.15384615384615385,
+            "false_positive_rate": 0.1111111111111111
+          }
+        }
+      }
+    },
+    "after": {
+      "real": {
+        "all": {
+          "per_rule": {
+            "AUTH001": {
+              "tp": 0,
+              "fp": 9,
+              "tn": 69,
+              "fn": 0,
+              "cases": 78,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.11538461538461539
+            },
+            "SECRET001": {
+              "tp": 0,
+              "fp": 3,
+              "tn": 75,
+              "fn": 0,
+              "cases": 78,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.038461538461538464
+            },
+            "LOG001": {
+              "tp": 0,
+              "fp": 0,
+              "tn": 78,
+              "fn": 0,
+              "cases": 78,
+              "positives": 0,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0
+            },
+            "TESTCOV001": {
+              "tp": 22,
+              "fp": 9,
+              "tn": 45,
+              "fn": 2,
+              "cases": 78,
+              "positives": 24,
+              "precision": 0.7096774193548387,
+              "recall": 0.9166666666666666,
+              "f1": 0.7999999999999999,
+              "false_positive_rate": 0.16666666666666666
+            },
+            "SCOPE001": {
+              "tp": 1,
+              "fp": 0,
+              "tn": 74,
+              "fn": 3,
+              "cases": 78,
+              "positives": 4,
+              "precision": 1.0,
+              "recall": 0.25,
+              "f1": 0.4,
+              "false_positive_rate": 0.0
+            },
+            "UNREVIEWABLE001": {
+              "tp": 0,
+              "fp": 1,
+              "tn": 77,
+              "fn": 0,
+              "cases": 78,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.01282051282051282
+            }
+          },
+          "security_rules": {
+            "tp": 0,
+            "fp": 12,
+            "tn": 66,
+            "fn": 0,
+            "cases": 78,
+            "positives": 0,
+            "precision": 0.0,
+            "recall": null,
+            "f1": null,
+            "false_positive_rate": 0.15384615384615385
+          },
+          "review_rules": {
+            "tp": 22,
+            "fp": 9,
+            "tn": 42,
+            "fn": 5,
+            "cases": 78,
+            "positives": 27,
+            "precision": 0.7096774193548387,
+            "recall": 0.8148148148148148,
+            "f1": 0.7586206896551724,
+            "false_positive_rate": 0.17647058823529413
+          },
+          "any_finding": {
+            "tp": 25,
+            "fp": 17,
+            "tn": 34,
+            "fn": 2,
+            "cases": 78,
+            "positives": 27,
+            "precision": 0.5952380952380952,
+            "recall": 0.9259259259259259,
+            "f1": 0.7246376811594204,
+            "false_positive_rate": 0.3333333333333333
+          },
+          "review_or_reject": {
+            "tp": 2,
+            "fp": 6,
+            "tn": 45,
+            "fn": 25,
+            "cases": 78,
+            "positives": 27,
+            "precision": 0.25,
+            "recall": 0.07407407407407407,
+            "f1": 0.11428571428571428,
+            "false_positive_rate": 0.11764705882352941
+          }
+        },
+        "dev": {
+          "per_rule": {
+            "AUTH001": {
+              "tp": 0,
+              "fp": 2,
+              "tn": 36,
+              "fn": 0,
+              "cases": 38,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.05263157894736842
+            },
+            "SECRET001": {
+              "tp": 0,
+              "fp": 1,
+              "tn": 37,
+              "fn": 0,
+              "cases": 38,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.02631578947368421
+            },
+            "LOG001": {
+              "tp": 0,
+              "fp": 0,
+              "tn": 38,
+              "fn": 0,
+              "cases": 38,
+              "positives": 0,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0
+            },
+            "TESTCOV001": {
+              "tp": 13,
+              "fp": 5,
+              "tn": 20,
+              "fn": 0,
+              "cases": 38,
+              "positives": 13,
+              "precision": 0.7222222222222222,
+              "recall": 1.0,
+              "f1": 0.8387096774193548,
+              "false_positive_rate": 0.2
+            },
+            "SCOPE001": {
+              "tp": 0,
+              "fp": 0,
+              "tn": 37,
+              "fn": 1,
+              "cases": 38,
+              "positives": 1,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0
+            },
+            "UNREVIEWABLE001": {
+              "tp": 0,
+              "fp": 0,
+              "tn": 38,
+              "fn": 0,
+              "cases": 38,
+              "positives": 0,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0
+            }
+          },
+          "security_rules": {
+            "tp": 0,
+            "fp": 3,
+            "tn": 35,
+            "fn": 0,
+            "cases": 38,
+            "positives": 0,
+            "precision": 0.0,
+            "recall": null,
+            "f1": null,
+            "false_positive_rate": 0.07894736842105263
+          },
+          "review_rules": {
+            "tp": 13,
+            "fp": 5,
+            "tn": 19,
+            "fn": 1,
+            "cases": 38,
+            "positives": 14,
+            "precision": 0.7222222222222222,
+            "recall": 0.9285714285714286,
+            "f1": 0.8125000000000001,
+            "false_positive_rate": 0.20833333333333334
+          },
+          "any_finding": {
+            "tp": 14,
+            "fp": 7,
+            "tn": 17,
+            "fn": 0,
+            "cases": 38,
+            "positives": 14,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "f1": 0.8,
+            "false_positive_rate": 0.2916666666666667
+          },
+          "review_or_reject": {
+            "tp": 0,
+            "fp": 2,
+            "tn": 22,
+            "fn": 14,
+            "cases": 38,
+            "positives": 14,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "false_positive_rate": 0.08333333333333333
+          }
+        },
+        "heldout": {
+          "per_rule": {
+            "AUTH001": {
+              "tp": 0,
+              "fp": 7,
+              "tn": 33,
+              "fn": 0,
+              "cases": 40,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.175
+            },
+            "SECRET001": {
+              "tp": 0,
+              "fp": 2,
+              "tn": 38,
+              "fn": 0,
+              "cases": 40,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.05
+            },
+            "LOG001": {
+              "tp": 0,
+              "fp": 0,
+              "tn": 40,
+              "fn": 0,
+              "cases": 40,
+              "positives": 0,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0
+            },
+            "TESTCOV001": {
+              "tp": 9,
+              "fp": 4,
+              "tn": 25,
+              "fn": 2,
+              "cases": 40,
+              "positives": 11,
+              "precision": 0.6923076923076923,
+              "recall": 0.8181818181818182,
+              "f1": 0.7500000000000001,
+              "false_positive_rate": 0.13793103448275862
+            },
+            "SCOPE001": {
+              "tp": 1,
+              "fp": 0,
+              "tn": 37,
+              "fn": 2,
+              "cases": 40,
+              "positives": 3,
+              "precision": 1.0,
+              "recall": 0.3333333333333333,
+              "f1": 0.5,
+              "false_positive_rate": 0.0
+            },
+            "UNREVIEWABLE001": {
+              "tp": 0,
+              "fp": 1,
+              "tn": 39,
+              "fn": 0,
+              "cases": 40,
+              "positives": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.025
+            }
+          },
+          "security_rules": {
+            "tp": 0,
+            "fp": 9,
+            "tn": 31,
+            "fn": 0,
+            "cases": 40,
+            "positives": 0,
+            "precision": 0.0,
+            "recall": null,
+            "f1": null,
+            "false_positive_rate": 0.225
+          },
+          "review_rules": {
+            "tp": 9,
+            "fp": 4,
+            "tn": 23,
+            "fn": 4,
+            "cases": 40,
+            "positives": 13,
+            "precision": 0.6923076923076923,
+            "recall": 0.6923076923076923,
+            "f1": 0.6923076923076923,
+            "false_positive_rate": 0.14814814814814814
+          },
+          "any_finding": {
+            "tp": 11,
+            "fp": 10,
+            "tn": 17,
+            "fn": 2,
+            "cases": 40,
+            "positives": 13,
+            "precision": 0.5238095238095238,
+            "recall": 0.8461538461538461,
+            "f1": 0.6470588235294118,
+            "false_positive_rate": 0.37037037037037035
+          },
+          "review_or_reject": {
+            "tp": 2,
+            "fp": 4,
+            "tn": 23,
+            "fn": 11,
+            "cases": 40,
+            "positives": 13,
+            "precision": 0.3333333333333333,
+            "recall": 0.15384615384615385,
+            "f1": 0.21052631578947367,
+            "false_positive_rate": 0.14814814814814814
+          }
+        }
+      },
+      "synthetic": {
+        "all": {
+          "per_rule": {
+            "AUTH001": {
+              "tp": 3,
+              "fp": 0,
+              "tn": 17,
+              "fn": 0,
+              "cases": 20,
+              "positives": 3,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "false_positive_rate": 0.0
+            },
+            "SECRET001": {
+              "tp": 2,
+              "fp": 0,
+              "tn": 18,
+              "fn": 0,
+              "cases": 20,
+              "positives": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "false_positive_rate": 0.0
+            },
+            "LOG001": {
+              "tp": 2,
+              "fp": 0,
+              "tn": 18,
+              "fn": 0,
+              "cases": 20,
+              "positives": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "false_positive_rate": 0.0
+            },
+            "TESTCOV001": {
+              "tp": 1,
+              "fp": 1,
+              "tn": 18,
+              "fn": 0,
+              "cases": 20,
+              "positives": 1,
+              "precision": 0.5,
+              "recall": 1.0,
+              "f1": 0.6666666666666666,
+              "false_positive_rate": 0.05263157894736842
+            },
+            "SCOPE001": {
+              "tp": 1,
+              "fp": 1,
+              "tn": 18,
+              "fn": 0,
+              "cases": 20,
+              "positives": 1,
+              "precision": 0.5,
+              "recall": 1.0,
+              "f1": 0.6666666666666666,
+              "false_positive_rate": 0.05263157894736842
+            },
+            "UNREVIEWABLE001": {
+              "tp": 2,
+              "fp": 0,
+              "tn": 18,
+              "fn": 0,
+              "cases": 20,
+              "positives": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "false_positive_rate": 0.0
+            }
+          },
+          "security_rules": {
+            "tp": 7,
+            "fp": 0,
+            "tn": 13,
+            "fn": 0,
+            "cases": 20,
+            "positives": 7,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "review_rules": {
+            "tp": 4,
+            "fp": 1,
+            "tn": 15,
+            "fn": 0,
+            "cases": 20,
+            "positives": 4,
+            "precision": 0.8,
+            "recall": 1.0,
+            "f1": 0.888888888888889,
+            "false_positive_rate": 0.0625
+          },
+          "any_finding": {
+            "tp": 11,
+            "fp": 0,
+            "tn": 9,
+            "fn": 0,
+            "cases": 20,
+            "positives": 11,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "review_or_reject": {
+            "tp": 1,
+            "fp": 0,
+            "tn": 9,
+            "fn": 10,
+            "cases": 20,
+            "positives": 11,
+            "precision": 1.0,
+            "recall": 0.09090909090909091,
+            "f1": 0.16666666666666669,
+            "false_positive_rate": 0.0
+          }
+        }
+      }
+    }
+  }
+}

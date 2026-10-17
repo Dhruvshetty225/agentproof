@@ -216,6 +216,19 @@ Some real PRs raise concerns outside the six rule categories, such as a
 possible path traversal, removed supply-chain pinning or deleted tests.
 These are described in `notes` and are not counted as rule positives.
 
+## Evaluation
+
+```bash
+python -m eval.split      # recreate eval/split.csv (committed; the same every time)
+python -m eval.run_eval   # original vs improved version; writes eval/results/
+```
+
+The split puts about half of the real cases in a development set and half
+in a held-out set, keeping each repository on one side; all synthetic cases
+are development cases. It was committed before any result was computed.
+[`results/README.md`](results/README.md) explains the results and analyzes
+the failures.
+
 ## Limitations
 
 - **Selection bias.** Only merged PRs in public repositories with 10 or

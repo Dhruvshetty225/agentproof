@@ -1,0 +1,38 @@
+{
+  "command": "python -m eval.run_eval",
+  "generated_at": "2026-10-17T00:22:09+00:00",
+  "python": "3.12.6",
+  "platform": "macOS-26.2-arm64-arm-64bit",
+  "git": "git version 2.50.1 (Apple Git-155)",
+  "packages": {
+    "typer": "0.27.3",
+    "GitPython": "3.2.1",
+    "Jinja2": "3.1.6",
+    "rich": "15.0.0",
+    "matplotlib": "3.11.2"
+  },
+  "commits": {
+    "before": "819cbb200640f5753c4c4ca8d5f0bb770ec71889",
+    "after": "ef6883339495a7c31e7a60fb3b5ce9fd106d572b"
+  },
+  "agentproof_changes_uncommitted": false,
+  "dataset": {
+    "labels.csv": "fecfb57bc43de636e44be45127a24e1bcc5cc2e2065045d352c0d038c59af61f",
+    "manifest.csv": "25c0e4a6aed428894cf7a12eea7a6a333d82ec37d8fa1682b1ceacd985c6fbf5",
+    "split.csv": "8ba0b07cf5046a0ea01fce3ff004755f56d1581828617a39cc9da463f9186ccc",
+    "real_diffs_verified_against_manifest": 78,
+    "synthetic_diffs_sha256": "3803fcaed3949f58183a90e52327040417615d27cbd7aeafee9fa47654b17ddc"
+  },
+  "cases_used": {
+    "real": 78,
+    "synthetic": 20
+  },
+  "rows_skipped_not_reviewed": 0,
+  "u0_conversion": "checked for all 98 diffs",
+  "code_sha256": {
+    "run_rules.py": "c52ee26551954c1e46669c63e442b573b09f174b38ab56aa8b52a1421bf7e31e",
+    "u0.py": "da3f51be613fcc0e378ba0b6f386f22458d779ad64345eaa47d3b68ca84905be",
+    "metrics.py": "bffb0155fde270ae3be3c750dd07caf88d8003d8af6396a8f0f985e52630dd15"
+  },
+  "charts": "written"
+}
