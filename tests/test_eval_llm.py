@@ -72,6 +72,7 @@ def test_three_modes_are_evaluated_on_the_same_cases(tmp_path, monkeypatch):
 
     env = json.loads((results / "environment.json").read_text(encoding="utf-8"))
     assert env["model"] == "fake-model:7b" and env["cost"].startswith("local; no paid API cost")
+    assert env["warmup_seconds"] >= 0
     assert "Is this change actually risky?" in env["prompts"]["question"]
     comparison = (results / "comparison.md").read_text(encoding="utf-8")
     assert "Rules only P / R / F1" in comparison and "Average seconds per case" in comparison
@@ -85,6 +86,13 @@ def test_benchmark_is_not_run_without_ollama(tmp_path, capsys):
     assert run_llm_eval.main(["--results-dir", str(results)], client=client) == 2
     assert "Benchmark not run" in capsys.readouterr().err
     assert not results.exists()
+
+
+def test_benchmark_is_not_run_when_the_warm_up_fails(tmp_path, capsys):
+    client = FakeClient([LLMUnavailable("model failed to load")])
+    assert run_llm_eval.main(["--results-dir", str(tmp_path / "llm")], client=client) == 2
+    assert "warm-up call failed" in capsys.readouterr().err
+    assert client.timeout == 5.0  # the longer warm-up timeout is undone
 
 
 def test_benchmark_is_not_run_without_the_model(tmp_path, capsys):
