@@ -10,6 +10,10 @@ Output rules for ``agentproof audit``:
 * Status messages and errors always go to standard error, so standard output
   holds nothing but the report (e.g. ``--format json > report.json`` works).
 
+``--llm-verify`` (off by default) asks a local Ollama model whether each
+finding is actually risky; see agentproof/llm_verify.py. If Ollama cannot be
+reached, the audit still runs and the report says it is rules-only.
+
 Exit codes: 0 approve or review, 1 reject, 2 usage, configuration, git or
 file errors.
 """
@@ -29,6 +33,14 @@ from rich.table import Table
 
 from agentproof.config import ConfigError, load_config
 from agentproof.engine import run_audit
+from agentproof.llm_verify import (
+    DEFAULT_MODEL,
+    DEFAULT_TIMEOUT,
+    DEFAULT_URL,
+    LLMVerifier,
+    LocalOnlyError,
+    OllamaClient,
+)
 from agentproof.redaction import redact_report
 from agentproof.report import render_html, render_json
 from agentproof.sarif import render_sarif
@@ -119,18 +131,44 @@ def audit(
         "--config",
         help="Path to a .agentproof.toml file. Default: .agentproof.toml on the base branch.",
     ),
+    llm_verify: bool = typer.Option(
+        False,
+        "--llm-verify",
+        help="Ask a local Ollama model whether each finding is actually risky (off by default).",
+    ),
+    llm_model: str = typer.Option(DEFAULT_MODEL, "--llm-model", help="Local Ollama model to use."),
+    llm_url: str = typer.Option(
+        DEFAULT_URL, "--llm-url", help="Local Ollama server; must be on this machine."
+    ),
+    llm_timeout: float = typer.Option(
+        DEFAULT_TIMEOUT, "--llm-timeout", help="Seconds to wait for each answer from the model."
+    ),
 ) -> None:
     """Audit the changes BRANCH made since it diverged from BASE in REPO."""
     report_format = _resolve_format(output_format, output)
+    verifier = None
+    if llm_verify:
+        try:
+            verifier = LLMVerifier(OllamaClient(llm_url, llm_model, llm_timeout))
+        except LocalOnlyError as error:
+            _fail("LLM verifier", error)
     try:
         config = load_config(repo, base, config_path)
-        report = run_audit(repo_path=repo, base=base, branch=branch, task=task, config=config)
+        report = run_audit(
+            repo_path=repo, base=base, branch=branch, task=task, config=config, verifier=verifier
+        )
     except ConfigError as error:
         _fail("Configuration error", error)
     except (GitError, ODBError) as error:
         _fail(
             "Git error (check --repo, --base and --branch; CI checkouts need full history)",
             error,
+        )
+
+    if report.llm_verification is not None and report.llm_verification.fallback:
+        status.print(
+            f"[yellow]LLM verifier:[/yellow] {escape(report.llm_verification.fallback)}",
+            soft_wrap=True,
         )
 
     try:
@@ -208,13 +246,21 @@ def _print_terminal_report(report: AuditReport, out: Optional[Console] = None) -
             f"Ignored by inline directives ({len(report.ignored_findings)}): "
             f"{escape(ignored)}"
         )
+    _print_llm_summary(report, out)
     out.print()
 
     if not report.findings:
-        out.print(
-            "[bold green]No findings from AgentProof's rules.[/bold green] "
-            "This does not prove the change is safe; review it as usual."
-        )
+        if report.llm_suppressed_findings:
+            out.print(
+                "[bold green]No findings left after local LLM verification.[/bold green] "
+                "The suppressed findings are listed above. This does not prove the change "
+                "is safe; review it as usual."
+            )
+        else:
+            out.print(
+                "[bold green]No findings from AgentProof's rules.[/bold green] "
+                "This does not prove the change is safe; review it as usual."
+            )
         return
 
     table = Table(show_lines=True, expand=True)
@@ -238,6 +284,25 @@ def _print_terminal_report(report: AuditReport, out: Optional[Console] = None) -
         )
 
     out.print(table)
+
+
+def _print_llm_summary(report: AuditReport, out: Console) -> None:
+    summary = report.llm_verification
+    if summary is None:
+        return
+    suppressed = len(report.llm_suppressed_findings)
+    out.print(
+        f"Local LLM verification ({escape(summary.model)}): "
+        f"{suppressed} suppressed, {len(summary.decisions) - suppressed} kept"
+    )
+    if summary.fallback:
+        out.print(f"[yellow]LLM fallback:[/yellow] {escape(summary.fallback)}")
+    for decision in summary.decisions:
+        if decision.suppressed:
+            out.print(
+                f"  suppressed {decision.rule_id} at {escape(decision.location)}: "
+                f"{escape(decision.reason)}"
+            )
 
 
 if __name__ == "__main__":

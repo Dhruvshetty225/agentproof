@@ -74,4 +74,25 @@ def render_json(report: AuditReport) -> str:
         "findings": [_finding_to_dict(f) for f in report.findings],
         "ignored_findings": [_finding_to_dict(f) for f in report.ignored_findings],
     }
+    # Only present with --llm-verify, so the default output does not change.
+    summary = report.llm_verification
+    if summary is not None:
+        data["llm_suppressed_findings"] = [_finding_to_dict(f) for f in report.llm_suppressed_findings]
+        data["llm_verification"] = {
+            "model": summary.model,
+            "url": summary.url,
+            "ollama_version": summary.ollama_version,
+            "fallback": summary.fallback,
+            "decisions": [
+                {
+                    "rule_id": d.rule_id,
+                    "location": d.location,
+                    "suppressed": d.suppressed,
+                    "status": d.status,
+                    "reason": d.reason,
+                    "seconds": d.seconds,
+                }
+                for d in summary.decisions
+            ],
+        }
     return json.dumps(data, indent=2) + "\n"

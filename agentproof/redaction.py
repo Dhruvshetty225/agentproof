@@ -70,18 +70,29 @@ def _redact_finding(finding: Finding, secrets: set[str]) -> Finding:
 
 def redact_report(report: AuditReport) -> AuditReport:
     """Return a copy of `report` that is safe to display or write to a file."""
-    all_findings = report.findings + report.ignored_findings
+    all_findings = report.findings + report.ignored_findings + report.llm_suppressed_findings
     texts = [text for finding in all_findings for text in _text_fields(finding)]
     if report.task:
         texts.append(report.task)
+    summary = report.llm_verification
+    if summary is not None:
+        texts.extend(decision.reason for decision in summary.decisions)
 
     secrets: set[str] = set()
     for text in texts:
         secrets.update(secret_values(text))
+
+    if summary is not None:
+        # The model's reasons are text like any other and could repeat a secret.
+        summary = replace(summary, decisions=[
+            replace(d, reason=redact_text(d.reason, secrets)) for d in summary.decisions
+        ])
 
     return replace(
         report,
         task=redact_text(report.task, secrets) if report.task else report.task,
         findings=[_redact_finding(f, secrets) for f in report.findings],
         ignored_findings=[_redact_finding(f, secrets) for f in report.ignored_findings],
+        llm_suppressed_findings=[_redact_finding(f, secrets) for f in report.llm_suppressed_findings],
+        llm_verification=summary,
     )

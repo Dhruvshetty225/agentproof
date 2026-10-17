@@ -78,6 +78,33 @@ class Finding:
         return f"{self.file_path}:{self.lines}"
 
 
+@dataclass(frozen=True)
+class LLMDecision:
+    """What the optional local LLM verifier decided about one finding."""
+
+    rule_id: str
+    location: str
+    suppressed: bool
+    # Why: "judged_not_risky", "confirmed_risky", "not_eligible_critical",
+    # "possible_prompt_injection", "malformed_reply", "timeout", "unavailable"
+    # or "skipped_after_failures". Only "judged_not_risky" suppresses.
+    status: str
+    reason: str  # the model's one-sentence reason, or why the finding was kept
+    seconds: float | None = None
+
+
+@dataclass
+class LLMVerificationSummary:
+    """The verifier's settings and decisions, shown in every report format."""
+
+    model: str
+    url: str
+    ollama_version: str | None
+    decisions: list[LLMDecision] = field(default_factory=list)
+    # Set when the verifier could not run; the report is then rules-only.
+    fallback: str | None = None
+
+
 @dataclass
 class AuditReport:
     """The full result of auditing a branch against a base."""
@@ -94,6 +121,10 @@ class AuditReport:
     # but still listed so reviewers can see what was silenced.
     ignored_findings: list[Finding] = field(default_factory=list)
     config_source: str = "built-in defaults"
+    # Only set with --llm-verify: findings the local model judged not risky
+    # (not scored, but listed), and the verifier's settings and decisions.
+    llm_suppressed_findings: list[Finding] = field(default_factory=list)
+    llm_verification: LLMVerificationSummary | None = None
 
     def findings_by_severity(self, severity: Severity) -> list[Finding]:
         return [f for f in self.findings if f.severity == severity]

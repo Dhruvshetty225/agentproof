@@ -90,11 +90,20 @@ def run_audit(
     branch: str,
     task: str | None = None,
     config: Config | None = None,
+    verifier=None,
 ) -> AuditReport:
-    """Parse the diff between base and branch, run all rules, and score the result."""
+    """Parse the diff between base and branch, run all rules, and score the result.
+
+    ``verifier`` is the optional local LLM verifier (agentproof.llm_verify).
+    It runs after the rules and may suppress findings; the score is computed
+    from the findings that remain.
+    """
     config = config or Config()
     file_diffs = parse_diff(repo_path, base, branch)
     findings, ignored = collect_findings(file_diffs, task=task, config=config)
+    llm_suppressed, llm_summary = [], None
+    if verifier is not None:
+        findings, llm_suppressed, llm_summary = verifier.verify(findings, file_diffs, task)
 
     risk_score = calculate_risk_score(findings)
     recommendation = recommend(risk_score, config.review_threshold, config.reject_threshold)
@@ -110,4 +119,6 @@ def run_audit(
         changed_files=changed_file_paths(file_diffs),
         ignored_findings=ignored,
         config_source=config.source,
+        llm_suppressed_findings=llm_suppressed,
+        llm_verification=llm_summary,
     )

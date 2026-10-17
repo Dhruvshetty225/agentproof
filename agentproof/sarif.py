@@ -15,6 +15,10 @@ How AgentProof maps onto SARIF:
 * Findings about whole files point at each file, without a region.
 * Findings silenced by ``agentproof: ignore[...]`` are included with an
   "inSource" suppression, so tools show them as suppressed, not as open.
+* With --llm-verify, findings the local model judged not risky are included
+  with an "external" suppression whose justification is the model's reason,
+  and the run's ``properties.llmVerification`` records the model and any
+  fallback. Without --llm-verify, neither appears.
 * The run's ``properties`` hold the risk score and recommendation.
 
 Text is redacted before rendering, like every other output format.
@@ -85,7 +89,14 @@ def _message(finding: Finding, base: str) -> str:
     return " ".join(parts)
 
 
-def _result(finding: Finding, base: str, suppressed: bool) -> dict:
+_IGNORE_SUPPRESSION = {"kind": "inSource", "justification": "agentproof: ignore directive on this line"}
+
+
+def _llm_suppression(model: str, reason: str) -> dict:
+    return {"kind": "external", "justification": f"Local LLM verifier ({model}) judged it not risky: {reason}"}
+
+
+def _result(finding: Finding, base: str, suppression: dict | None = None) -> dict:
     result = {
         "ruleId": finding.rule_id,
         "level": _LEVELS[finding.severity],
@@ -99,17 +110,22 @@ def _result(finding: Finding, base: str, suppressed: bool) -> dict:
         result["properties"]["diffSide"] = "old"
         result["properties"]["baseStartLine"] = finding.line_number
         result["properties"]["baseEndLine"] = finding.end_line_number or finding.line_number
-    if suppressed:
-        result["suppressions"] = [
-            {"kind": "inSource", "justification": "agentproof: ignore directive on this line"}
-        ]
+    if suppression is not None:
+        result["suppressions"] = [suppression]
     return result
 
 
 def render_sarif(report: AuditReport) -> str:
     report = redact_report(report)
-    results = [_result(f, report.base, suppressed=False) for f in report.findings]
-    results += [_result(f, report.base, suppressed=True) for f in report.ignored_findings]
+    results = [_result(f, report.base) for f in report.findings]
+    results += [_result(f, report.base, _IGNORE_SUPPRESSION) for f in report.ignored_findings]
+    summary = report.llm_verification
+    if summary is not None:
+        reasons = {(d.rule_id, d.location): d.reason for d in summary.decisions if d.suppressed}
+        results += [
+            _result(f, report.base, _llm_suppression(summary.model, reasons.get((f.rule_id, f.location), "")))
+            for f in report.llm_suppressed_findings
+        ]
     sarif = {
         "$schema": SARIF_SCHEMA_URI,
         "version": SARIF_VERSION,
@@ -134,4 +150,11 @@ def render_sarif(report: AuditReport) -> str:
             }
         ],
     }
+    if summary is not None:
+        sarif["runs"][0]["properties"]["llmVerification"] = {
+            "model": summary.model,
+            "ollamaVersion": summary.ollama_version,
+            "fallback": summary.fallback,
+            "suppressed": len(report.llm_suppressed_findings),
+        }
     return json.dumps(sarif, indent=2) + "\n"
