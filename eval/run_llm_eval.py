@@ -3,8 +3,10 @@
     python -m eval.run_llm_eval [--model qwen2.5-coder:7b] [--limit N]
 
 Needs a local Ollama server with the model already downloaded (see
-docs/LLM_VERIFIER.md). If Ollama is not reachable or the model is missing,
-nothing is run or written and the benchmark is reported as not run.
+docs/LLM_VERIFIER.md), and the real pull-request diffs in eval/data/real/
+(python -m eval.collect --from-manifest eval/manifest.csv). If Ollama is not
+reachable, the model is missing or the diffs are missing, nothing is run or
+written and the benchmark is reported as not run.
 
 All three modes get the same reviewed cases, the same task text (PR title
 and description) and code from the same -U0 diff (eval/u0.py). The rules get
@@ -507,6 +509,12 @@ def _report(results_dir: Path, cases: list[Case], records: dict, argv: list, lim
     write_outputs(results_dir, cases, records, env)
 
 
+def _selected_cases(limit: int | None) -> list[Case]:
+    """The reviewed cases in a fixed order, the first `limit` of them if given."""
+    cases, _skipped = load_cases()
+    return sorted(cases, key=lambda case: case.case_id)[:limit]
+
+
 def main(argv: list | None = None, client=None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -520,12 +528,14 @@ def main(argv: list | None = None, client=None) -> int:
     args = parser.parse_args(argv)
     results_dir = args.results_dir or EVAL_DIR / "results" / ("llm-smoke" if args.limit else "llm")
 
-    cases, _skipped = load_cases()
-    cases = sorted(cases, key=lambda case: case.case_id)[: args.limit]
-
     if args.report_only:
         if not (results_dir / IDENTITY_FILE).exists():
             print(f"Nothing to report: no saved run in {results_dir}.", file=sys.stderr)
+            return 2
+        try:
+            cases = _selected_cases(args.limit)
+        except (RuntimeError, ValueError) as error:
+            print(f"Report not written: {error}", file=sys.stderr)
             return 2
         _report(results_dir, cases, load_records(results_dir), argv, args.limit)
         print(f"report written to {results_dir}")
@@ -542,6 +552,11 @@ def main(argv: list | None = None, client=None) -> int:
     if not model_info:
         print(f"Benchmark not run: model {client.model!r} is not downloaded "
               f"(ollama pull {client.model}).", file=sys.stderr)
+        return 2
+    try:
+        cases = _selected_cases(args.limit)
+    except (RuntimeError, ValueError) as error:  # e.g. the real diffs are not downloaded
+        print(f"Benchmark not run: {error}", file=sys.stderr)
         return 2
 
     identity = run_identity(client, ollama_version, model_info)

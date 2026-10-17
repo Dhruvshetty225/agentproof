@@ -88,7 +88,7 @@ def test_benchmark_is_not_run_without_ollama(tmp_path, capsys):
     assert not results.exists()
 
 
-def test_benchmark_is_not_run_when_the_warm_up_fails(tmp_path, capsys):
+def test_benchmark_is_not_run_when_the_warm_up_fails(tmp_path, capsys, five_cases):
     client = FakeClient([LLMUnavailable("model failed to load")])
     assert run_llm_eval.main(["--results-dir", str(tmp_path / "llm")], client=client) == 2
     assert "warm-up call failed" in capsys.readouterr().err
@@ -209,3 +209,33 @@ def test_report_only_needs_no_model_and_marks_a_partial_run(tmp_path, five_cases
 def test_report_only_without_a_saved_run_says_so(tmp_path, five_cases, capsys):
     assert run_llm_eval.main(["--results-dir", str(tmp_path / "none"), "--report-only"]) == 2
     assert "Nothing to report" in capsys.readouterr().err
+
+
+def _dataset_missing():
+    raise RuntimeError("missing eval/data/real/gh-x; run: python -m eval.collect --from-manifest eval/manifest.csv")
+
+
+def test_a_missing_dataset_stops_cleanly_after_the_ollama_checks(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(run_llm_eval, "load_cases", _dataset_missing)
+    results = tmp_path / "llm"
+    client = ScriptedClient()
+    assert run_llm_eval.main(["--results-dir", str(results)], client=client) == 2
+    error = capsys.readouterr().err
+    assert "Benchmark not run" in error and "eval.collect --from-manifest" in error
+    assert client.prompts == []  # no warm-up and no model call without data
+    assert not results.exists()
+
+
+def test_ollama_is_checked_before_the_dataset(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(run_llm_eval, "load_cases", _dataset_missing)
+    client = FakeClient(version_error=LLMUnavailable("cannot reach Ollama"))
+    assert run_llm_eval.main(["--results-dir", str(tmp_path / "llm")], client=client) == 2
+    assert "Start Ollama" in capsys.readouterr().err
+
+
+def test_report_only_with_a_missing_dataset_says_so(tmp_path, five_cases, monkeypatch, capsys):
+    results = tmp_path / "llm"
+    assert run_llm_eval.main(["--results-dir", str(results), "--limit", "2"], client=ScriptedClient()) == 0
+    monkeypatch.setattr(run_llm_eval, "load_cases", _dataset_missing)
+    assert run_llm_eval.main(["--results-dir", str(results), "--report-only"]) == 2
+    assert "Report not written" in capsys.readouterr().err
