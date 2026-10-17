@@ -45,9 +45,21 @@ def mask_secret(secret: str) -> str:
 
 def redact_text(text: str, secrets: Iterable[str]) -> str:
     """Mask private-key bodies and every occurrence of the given secrets."""
-    text = _PRIVATE_KEY_RE.sub(lambda m: m.group(1) + MASK + m.group(3), text)
+    return _redact(text, _longest_first(secrets))
+
+
+def _longest_first(secrets: Iterable[str]) -> list[str]:
     # Longest first, so a secret that contains a shorter one is masked whole.
-    for secret in sorted(set(secrets), key=len, reverse=True):
+    return sorted(set(secrets), key=len, reverse=True)
+
+
+def _redact(text: str, ordered_secrets: list[str]) -> str:
+    text = _PRIVATE_KEY_RE.sub(lambda m: m.group(1) + MASK + m.group(3), text)
+    for secret in ordered_secrets:
+        # Most secrets are not in most texts. Checking that first is cheap and
+        # skips building a regular expression, which is the slow part.
+        if secret not in text:
+            continue
         masked = mask_secret(secret)
         # Only whole occurrences: "abc" is not masked inside "abcdef".
         pattern = re.compile(r"(?<![A-Za-z0-9])" + re.escape(secret) + r"(?![A-Za-z0-9])")
@@ -59,12 +71,12 @@ def _text_fields(finding: Finding) -> list[str]:
     return [finding.title, finding.evidence, finding.recommendation]
 
 
-def _redact_finding(finding: Finding, secrets: set[str]) -> Finding:
+def _redact_finding(finding: Finding, ordered_secrets: list[str]) -> Finding:
     return replace(
         finding,
-        title=redact_text(finding.title, secrets),
-        evidence=redact_text(finding.evidence, secrets),
-        recommendation=redact_text(finding.recommendation, secrets),
+        title=_redact(finding.title, ordered_secrets),
+        evidence=_redact(finding.evidence, ordered_secrets),
+        recommendation=_redact(finding.recommendation, ordered_secrets),
     )
 
 
@@ -81,18 +93,19 @@ def redact_report(report: AuditReport) -> AuditReport:
     secrets: set[str] = set()
     for text in texts:
         secrets.update(secret_values(text))
+    ordered = _longest_first(secrets)  # sorted once for the whole report
 
     if summary is not None:
         # The model's reasons are text like any other and could repeat a secret.
         summary = replace(summary, decisions=[
-            replace(d, reason=redact_text(d.reason, secrets)) for d in summary.decisions
+            replace(d, reason=_redact(d.reason, ordered)) for d in summary.decisions
         ])
 
     return replace(
         report,
-        task=redact_text(report.task, secrets) if report.task else report.task,
-        findings=[_redact_finding(f, secrets) for f in report.findings],
-        ignored_findings=[_redact_finding(f, secrets) for f in report.ignored_findings],
-        llm_suppressed_findings=[_redact_finding(f, secrets) for f in report.llm_suppressed_findings],
+        task=_redact(report.task, ordered) if report.task else report.task,
+        findings=[_redact_finding(f, ordered) for f in report.findings],
+        ignored_findings=[_redact_finding(f, ordered) for f in report.ignored_findings],
+        llm_suppressed_findings=[_redact_finding(f, ordered) for f in report.llm_suppressed_findings],
         llm_verification=summary,
     )

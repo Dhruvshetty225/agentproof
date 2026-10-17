@@ -45,7 +45,10 @@ _START = r"(?<![A-Za-z0-9])"
 _END = r"(?![A-Za-z0-9])"
 _PRIVATE_KEY_HEADER_RE = re.compile(r"-----BEGIN (?:(?:RSA|EC|OPENSSH|ENCRYPTED) )?PRIVATE KEY-----")
 _TOKEN_PATTERNS = [
-    ("API-key-shaped secret", re.compile(_START + r"sk-[A-Za-z0-9]{4,}")),
+    # After its first four letters or digits, an sk- key may contain "-" and
+    # "_" (as in "sk-proj-..."). The match runs to the end of the key, so
+    # redaction masks the whole key, not just "sk-proj".
+    ("API-key-shaped secret", re.compile(_START + r"sk-[A-Za-z0-9]{4,}[A-Za-z0-9_-]*")),
     ("AWS access key ID", re.compile(_START + r"AKIA[A-Z0-9]{16}" + _END)),
     ("GitHub token", re.compile(_START + r"gh[pos]_[A-Za-z0-9]{36}" + _END)),
     ("Slack token", re.compile(_START + r"xox[baprs]-[A-Za-z0-9][A-Za-z0-9-]*")),

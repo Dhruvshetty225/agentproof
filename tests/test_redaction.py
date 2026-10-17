@@ -10,7 +10,8 @@ from rich.console import Console
 
 from agentproof import cli
 from agentproof.redaction import mask_secret, redact_report, redact_text
-from agentproof.report import render_html
+from agentproof.report import render_html, render_json
+from agentproof.sarif import render_sarif
 from agentproof.schema import AuditReport, DiffSide, Finding, Severity
 
 FAKE_PASSWORD = "hunter2-fake-pass"
@@ -116,6 +117,17 @@ def test_text_without_secrets_is_unchanged():
     assert redact_report(report).findings[0].evidence == "if not user.is_authorized():"
 
 
+def test_many_secrets_are_each_masked():
+    values = [f"fake-value-{n:04d}-abcdef" for n in range(300)]
+    report = _report(*(
+        _finding("SECRET001", f'"service_{n}_api_key": "{value}"', line=n + 1)
+        for n, value in enumerate(values)
+    ))
+    for finding, value in zip(redact_report(report).findings, values):
+        assert value not in finding.evidence
+        assert '"fake****"' in finding.evidence
+
+
 # --- rendered output -----------------------------------------------------------
 
 
@@ -150,3 +162,25 @@ def test_terminal_report_contains_no_full_secret(monkeypatch):
     assert FAKE_KEY_BODY not in text
     assert "hunt****" in text
     assert "AKIA****" in text
+
+
+# A key with hyphens after "sk-", unquoted as in a .env file. Before the fix
+# only "sk-proj" was masked and the rest of the key stayed visible.
+PROJECT_KEY_REST = "Abc123Def456_Ghi789-Jkl012"
+FAKE_PROJECT_KEY = "sk-" + "proj-" + PROJECT_KEY_REST
+
+
+def _terminal_text(report: AuditReport) -> str:
+    output = io.StringIO()
+    # Wide enough that Rich never wraps the key across two lines.
+    cli._print_terminal_report(report, Console(file=output, width=400, no_color=True))
+    return output.getvalue()
+
+
+@pytest.mark.parametrize("render", [render_json, render_sarif, render_html, _terminal_text])
+def test_hyphenated_sk_key_is_fully_masked_in_every_format(render):
+    report = _report(_finding("SECRET001", f"OPENAI_API_KEY={FAKE_PROJECT_KEY}"))
+    text = render(report)
+    assert PROJECT_KEY_REST not in text
+    assert "Abc123" not in text
+    assert "OPENAI_API_KEY=sk-p****" in text

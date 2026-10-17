@@ -137,6 +137,16 @@ def test_ignores_malformed_or_public_shapes(content):
     assert secrets.check(_added(content)) == []
 
 
+def test_hyphenated_sk_key_is_flagged_and_its_value_is_the_whole_key():
+    key = "sk-" + "proj-" + "Abc123Def456_Ghi789-Jkl012"
+    content = f"OPENAI_API_KEY={key}"
+    findings = secrets.check(_added(content))
+    assert len(findings) == 1
+    assert findings[0].title == "API-key-shaped secret added to source code"
+    # Redaction masks exactly these values, so the whole key must be one value.
+    assert secrets.secret_values(content) == [key]
+
+
 # --- one finding per line ---------------------------------------------------
 
 
