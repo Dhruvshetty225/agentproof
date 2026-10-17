@@ -402,20 +402,26 @@ TESTCOV001 9, UNREVIEWABLE001 1). They fall into a few patterns:
 - **Raw model replies were not saved,** so the exact LLM replies cannot be
   checked; the parsed decisions can.
 
-## 9. Next steps
+## 9. Future work
 
-These are possible next steps, not done and not measured:
+This project measured how far simple rules go, so the evaluation reports
+the rules as built. The items below are outside that scope: each would
+change the measured results, or needs data or hardware this project did
+not have.
 
-- **Fix the false-positive patterns,** tuned on development cases only:
-  - skip lockfiles and documentation in AUTH001;
-  - treat fake values in test files differently in SECRET001;
-  - require more than one shared word in SCOPE001, or weight rare words;
-  - add `.vue` and similar extensions to TESTCOV001.
-- **Revisit scoring,** so that a removed security check or untested
-  behavior can reach "review" by default.
-- **Collect real security positives,** for example over a wider window,
-  to measure security recall on real data.
-- **Measure a larger local model** on a machine with more memory.
+- **Fewer false alarms.** Skip lockfiles and documentation in AUTH001,
+  treat fake values in test files differently in SECRET001, require more
+  than one shared word in SCOPE001 (or weight rare words), and recognize
+  `.vue` and similar files in TESTCOV001. This needs a new tuning round on
+  development cases only, then one fresh held-out measurement.
+- **Scoring.** Only 2 of the 27 risky real cases reach "review" with the
+  default scoring. Changing points or thresholds is a design decision
+  that would change every reported recommendation.
+- **Real security positives.** None of the 78 agent pull requests had one,
+  so measuring security recall on real data would likely need hundreds
+  more pull requests, for example from a wider time window.
+- **A larger local model.** The 7B model froze the 8 GB test machine;
+  this needs a machine with more memory.
 
 ## 10. Reproducing the results
 

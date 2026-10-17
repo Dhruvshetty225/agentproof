@@ -490,19 +490,24 @@ medium = 10, low = 5 points per finding (after grouping), summed and
 capped at 100. By default 0–29 → approve, 30–59 → review, 60–100 → reject;
 the thresholds can be changed in `.agentproof.toml`.
 
-## Future roadmap
+## Future work
+
+The evaluation measured the rules as built. These items are outside this
+project's scope: each would change the measured results, or needs data or
+hardware the project did not have (see
+[docs/REPORT.md, section 9](docs/REPORT.md#9-future-work)).
 
 - Support additional languages beyond Python (JS/TS, Go) in the rule set.
 - Post the report as a pull request comment from the GitHub Action.
-- **Reduce the false positives found in the evaluation,** tuning on the
-  development split only:
+- **Reduce the false positives found in the evaluation,** with a new
+  tuning round on the development split only:
   - skip lockfiles and documentation in AUTH001;
   - handle fake values in test files in SECRET001;
   - require more than one shared word in SCOPE001;
   - recognize `.vue` and similar files in TESTCOV001.
-- Revisit the default severities and thresholds, which rarely reach
-  "review" on their own.
-- Measure a larger local model on a machine with more memory.
+- Revisit the default severities and thresholds: only 2 of the 27 risky
+  real cases reach "review" today.
+- Measure a larger local model on a machine with more than 8 GB of memory.
 
 ## Known Limitations
 
