@@ -30,7 +30,8 @@ model is never asked for a confidence score; its yes/no is not a calibrated
 probability. A suppressed finding is still listed, so a reviewer can check it.
 
 Only a local server is used. The URL must point at this machine (127.0.0.1,
-::1 or localhost), proxies are bypassed, and model names marking Ollama's
+::1 or localhost), proxies are bypassed, HTTP redirects are refused (a
+redirect could point elsewhere), and model names marking Ollama's
 cloud-hosted models are refused. There is no cloud fallback.
 """
 
@@ -125,6 +126,13 @@ def check_local(url: str, model: str) -> None:
         raise LocalOnlyError(f"{model!r} is an Ollama cloud model; only local models are allowed")
 
 
+class _RefuseRedirects(urllib.request.HTTPRedirectHandler):
+    """Never follow a redirect: it could send the request to another host."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None  # urllib then raises HTTPError for the 3xx response
+
+
 class OllamaClient:
     """Minimal client for a local Ollama server, using only the standard library."""
 
@@ -134,8 +142,8 @@ class OllamaClient:
         self.url = url.rstrip("/")
         self.model = model
         self.timeout = timeout
-        # No proxy handler: requests must go straight to this machine.
-        self._opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        # No proxy and no redirects: requests must go straight to this machine.
+        self._opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _RefuseRedirects)
 
     def _request(self, path: str, payload: dict | None = None) -> dict:
         data = None if payload is None else json.dumps(payload).encode("utf-8")

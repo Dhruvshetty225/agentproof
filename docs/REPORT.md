@@ -314,6 +314,12 @@ What this shows:
   model and this setup. Whether a larger model would help was not
   measured.
 
+The benchmark saved each model call's parsed status and one-sentence
+reason, not the model's raw reply. The parsed decisions can be recomputed
+and checked from `eval/results/llm/`; the exact original replies cannot. For example, 4 saved hybrid decisions (all AUTH001 in `novu-11754`)
+give a reason starting "The flagged change is not actually risky" while
+the parsed answer was "risky".
+
 ## 7. Failure analysis
 
 These are the improved version's errors on real cases. The full list is in
@@ -372,7 +378,24 @@ TESTCOV001 9, UNREVIEWABLE001 1). They fall into a few patterns:
 - **Default configuration only.** Only the default severities and
   thresholds were evaluated.
 - **The LLM results cover one small model,** in one run on one machine.
-- **The GitHub Action has not been run** on GitHub-hosted runners.
+- **The GitHub Action has not been run** on GitHub-hosted runners. Its
+  shell steps are tested locally (`tests/test_action.py`).
+- **Not a tamper-resistant security gate.** An `agentproof: ignore[...]`
+  directive on an added line comes from the change being audited. A change
+  can use one to silence its own finding, for example a hardcoded secret,
+  and still be approved; this was confirmed in testing. The README
+  documents it, but documenting it does not prevent it.
+- **Detection gaps found in the final review** (listed in the README's
+  Known Limitations):
+  - SECRET001 misses names such as `aws_secret_access_key`, type-annotated
+    assignments, Go's `:=` and `sk_live_` keys;
+  - AUTH001 counts SQL and HTML comments and words in strings;
+  - quoted non-ASCII file names are shown wrongly;
+  - mode-only changes are invisible.
+- **Python versions.** Only Python 3.12 was tested. The project declares
+  3.9 or later.
+- **Raw model replies were not saved,** so the exact LLM replies cannot be
+  checked; the parsed decisions can.
 
 ## 9. Next steps
 

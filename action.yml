@@ -12,6 +12,10 @@
 #   base of base and head can be found.
 # * Leave the `config` input empty when auditing untrusted changes. A path
 #   inside the checked-out pull request is controlled by that pull request.
+# * This is not a tamper-resistant security gate. Inline
+#   `agentproof: ignore[...]` directives on lines the pull request adds come
+#   from the pull request itself, so it can silence findings on those lines
+#   and still pass fail-on-reject. Review the report's ignored findings.
 name: AgentProof
 description: Audit the changes in a pull request for risky AI-generated edits using deterministic rules.
 
@@ -98,8 +102,15 @@ runs:
         # 1) Human-readable report in the job log.
         code=0
         agentproof "${args[@]}" || code=$?
-        # 2) The report file for upload. Same audit, different format.
-        agentproof "${args[@]}" --format "$AP_FORMAT" --output "$AP_OUTPUT" || true
+        # 2) The report file for upload. Same audit, different format. Exit
+        #    code 1 only repeats the REJECT above; 2 means the report could
+        #    not be written, which must not be hidden.
+        report_code=0
+        agentproof "${args[@]}" --format "$AP_FORMAT" --output "$AP_OUTPUT" || report_code=$?
+        if [ "$report_code" = "2" ]; then
+          echo "::error::AgentProof could not write the report file $AP_OUTPUT (see the log above)."
+          code=2
+        fi
 
         echo "exit-code=$code" >> "$GITHUB_OUTPUT"
 

@@ -40,7 +40,14 @@ check, hardcoded secret or logged secret.
 ## Installation
 
 Everything runs locally, and every dependency is free and open source.
-AgentProof needs Python 3.9 or later and git.
+AgentProof needs git and Python. `pyproject.toml` declares Python 3.9 or
+later, but that is a stated compatibility, not a tested one:
+
+- **Tested:** the full test suite on Python 3.12 (macOS).
+- **Configured but not run for this work:** the CI workflow
+  (`.github/workflows/tests.yml`) tests 3.10, 3.11 and 3.12.
+- **Not tested:** 3.9. Every source file passes a 3.9 syntax check, nothing
+  more.
 
 ```bash
 git clone <this-repo>
@@ -231,7 +238,16 @@ How it handles the security-sensitive parts:
   merge base cannot be found and the action fails with exit code 2.
 - **Report upload:** the artifact upload works for every repository. The
   code scanning upload is optional and skipped for fork pull requests,
-  whose token cannot write security events.
+  whose token cannot write security events. If the report file cannot be
+  written, the action fails with exit code 2 rather than uploading nothing
+  silently.
+- **Not a tamper-resistant security gate.** The pull request controls the
+  ignore directives on the lines it adds. It can silence those findings and
+  still pass `fail-on-reject` (see
+  [Ignoring a specific finding](#ignoring-a-specific-finding)).
+  Documenting this does not prevent it. With the current configuration,
+  treat the result as review assistance, and check the ignored findings
+  (SARIF suppressions) in every review.
 
 Account-dependent limits (from GitHub's documentation; check the current
 billing pages before relying on them):
@@ -248,6 +264,17 @@ billing pages before relying on them):
 Nothing here runs automatically in this repository: the example lives in
 `examples/`, not `.github/workflows/`, and the action has not been run on
 GitHub-hosted runners as part of this work.
+
+The third-party actions used here were confirmed to exist with a read-only
+`git ls-remote` on 2026-10-17:
+
+- `actions/checkout@v7`
+- `actions/setup-python@v7`
+- `actions/upload-artifact@v7`
+- `github/codeql-action/upload-sarif@v4`
+
+They are pinned by tag, not by commit SHA, so what a tag points to can
+change.
 
 ## Configuration
 
@@ -294,6 +321,13 @@ DEFAULT_TOKEN = "placeholder"  # agentproof: ignore[SECRET001]
   line, it must be on that added line. For a deleted line, it must be on
   the deleted line itself, which means it was already in the base version:
   a change cannot silence a finding about code it deletes.
+- **Not a security boundary for added lines.** A directive on an added line
+  comes from the change being audited. A change can add, for example, a
+  hardcoded secret together with `# agentproof: ignore[SECRET001]` on the
+  same line. The finding then moves to the ignored list, is not scored,
+  and the change can still get APPROVE and exit code 0; this was confirmed
+  in testing. Documenting it does not prevent it. When auditing untrusted
+  changes, always read the ignored findings in the report.
 - Findings without a line (TESTCOV001, SCOPE001, UNREVIEWABLE001) cannot be
   ignored inline; disable the rule in `.agentproof.toml` instead.
 - Malformed directives (`ignore`, `ignore[]`, lowercase IDs, trailing
@@ -400,6 +434,10 @@ Two of these results are not what they look like:
   good detection.
 - **The hybrid's model answered "risky" every time,** so it removed nothing.
 
+The benchmark saved each model call's parsed status and one-sentence
+reason, not the model's raw reply. The parsed decisions can be recomputed
+and checked from `eval/results/llm/`; the exact original replies cannot.
+
 ## Project architecture
 
 ```
@@ -498,8 +536,13 @@ none of the six patterns was found in the diff's text.
   weakens security (removing `@csrf_exempt` is flagged too). Comment-only
   lines are skipped, but a trailing comment on a code line still counts,
   and `#` lines such as C `#define` are treated as comments. Negated or
-  differently named checks (`unauthorized`, `is_staff`) are not in the word
-  list.
+  differently named checks (`unauthorized`, `is_staff`, `is_verified`) are
+  not in the word list.
+
+  Only `#`, `//` and `/*` comments are skipped. SQL or Lua `--`,
+  HTML/Markdown `<!-- -->` and batch `@rem` comments still count, and so do
+  words inside strings, Markdown prose and lockfiles. These produced most
+  of its false alarms in the evaluation.
 - **Secret detection (SECRET001)** catches credential-named fields assigned
   a quoted literal (`db_password = "..."`, `"api_key": "..."`) and the token
   shapes it knows (`sk-`, AWS `AKIA...`, GitHub `ghp_/gho_/ghs_`, Slack
@@ -508,6 +551,13 @@ none of the six patterns was found in the diff's text.
   base64-encoded, assigned without quotes (unquoted YAML scalars), held in
   oddly named fields, or in other providers' formats. A quoted placeholder
   such as `"${DB_PASSWORD}"` is still reported as a hardcoded value.
+
+  Confirmed misses:
+  - names that don't end in password, secret, token or api key, such as
+    `aws_secret_access_key` and `private_key`;
+  - type-annotated assignments (`password: str = "..."`);
+  - Go's `:=`;
+  - Stripe-style `sk_live_...` keys.
 - **Logging safety (LOG001)** ignores words inside static messages
   (`logger.info("Reset token sent")`) and looks at the logged values:
   arguments, f-string/template placeholders and quoted lookup keys. It only
@@ -515,7 +565,8 @@ none of the six patterns was found in the diff's text.
   flagged, while `logger.info(mask(token))` still is. It checks one line at
   a time, so log calls split over several lines are missed, and it
   recognizes `print(...)` and `log`/`logger`/`logging` calls, not
-  `console.log`.
+  `console.log`. A sensitive name anywhere after the log call on the same
+  line counts, even in a separate statement (`print("ok"); password = x`).
 - **Test coverage (TESTCOV001)** only detects whether a file that *looks
   like* a test changed (`tests/`, `test_*.py`, `conftest.py`, `*.test.ts`,
   `*Test.java`, `*_test.go`, ...). It does not measure coverage. Any
@@ -536,7 +587,17 @@ none of the six patterns was found in the diff's text.
 - **Grouping** relies on indentation, so it assumes consistent
   indentation within a deleted block and only applies to deleted lines.
 - **Ignore directives** are plain text: AgentProof does not check that a
-  directive is inside a comment.
+  directive is inside a comment. A directive on an added line comes from
+  the change itself and can silence that line's findings, so AgentProof is
+  not a tamper-resistant security gate (see
+  [Ignoring a specific finding](#ignoring-a-specific-finding)).
+- **Unusual file names.** Git quotes file names that contain non-ASCII or
+  special characters (for example `"b/caf\303\251.py"`), and AgentProof
+  keeps the quoted form. Such paths are shown wrongly, and TESTCOV001 does
+  not treat them as source files.
+- **Mode-only changes** (for example making a file executable) change no
+  lines, so no rule sees them.
+- **Python versions:** only 3.12 was tested (see Installation).
 
 ## Running the tests
 

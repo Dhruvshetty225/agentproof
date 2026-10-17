@@ -32,6 +32,8 @@ class FakeOllama(ThreadingHTTPServer):
         self.delay = 0.0
         self.status = 200
         self.requests = []
+        self.paths = []  # every request, GET or POST
+        self.redirect_to = None  # set to a URL to answer every request with a redirect
 
     @property
     def url(self):
@@ -50,8 +52,17 @@ class _Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    def _redirect(self, code):
+        self.send_response(code)
+        self.send_header("Location", self.server.redirect_to + self.path)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def do_GET(self):
-        if self.path == "/api/version":
+        self.server.paths.append(("GET", self.path))
+        if self.server.redirect_to:
+            self._redirect(302)
+        elif self.path == "/api/version":
             self._send(200, {"version": "0.20.6"})
         elif self.path == "/api/tags":
             self._send(200, {"models": [{"name": MODEL, "digest": "abc123", "size": 4683087332}]})
@@ -60,6 +71,10 @@ class _Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+        self.server.paths.append(("POST", self.path))
+        if self.server.redirect_to:
+            self._redirect(303)  # urllib would re-send this as a GET to the new URL
+            return
         self.server.requests.append(body)
         time.sleep(self.server.delay)
         if self.server.status != 200:
@@ -68,14 +83,30 @@ class _Handler(BaseHTTPRequestHandler):
             self._send(200, {"model": body["model"], "response": self.server.answer, "done": True})
 
 
-@pytest.fixture
-def ollama():
+def _start():
     server = FakeOllama()
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
-    thread.start()
-    yield server
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return server
+
+
+def _stop(server):
     server.shutdown()
     server.server_close()
+
+
+@pytest.fixture
+def ollama():
+    server = _start()
+    yield server
+    _stop(server)
+
+
+@pytest.fixture
+def elsewhere():
+    """A second server standing in for wherever a redirect points."""
+    server = _start()
+    yield server
+    _stop(server)
 
 
 def _closed_port_url():
@@ -115,6 +146,19 @@ def test_a_slow_answer_is_a_timeout(ollama):
 def test_nothing_listening_is_unavailable():
     with pytest.raises(LLMUnavailable, match="cannot reach Ollama"):
         OllamaClient(_closed_port_url(), MODEL, timeout=2).version()
+
+
+@pytest.mark.parametrize("call", ["version", "generate"])
+def test_redirects_are_refused_and_nothing_reaches_the_target(ollama, elsewhere, call):
+    ollama.redirect_to = elsewhere.url
+    client = OllamaClient(ollama.url, MODEL, timeout=5)
+    with pytest.raises(LLMUnavailable, match="HTTP 30"):
+        if call == "version":
+            client.version()  # GET, answered with 302
+        else:
+            client.generate("s", "p", RESPONSE_SCHEMA)  # POST, answered with 303
+    assert len(ollama.paths) == 1  # the one request to the local server
+    assert elsewhere.paths == [] and elsewhere.requests == []  # nothing was forwarded
 
 
 def test_proxy_settings_are_ignored(ollama, monkeypatch):

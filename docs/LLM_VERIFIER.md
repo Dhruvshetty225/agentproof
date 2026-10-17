@@ -56,6 +56,8 @@ What it cannot do:
 
 - The URL must point at this machine (`127.0.0.1`, `::1` or `localhost`),
   and proxy settings are ignored.
+- HTTP redirects are refused, so a request cannot be forwarded to another
+  host.
 - Model names marking Ollama's cloud-hosted models (ending in `cloud`) are
   refused.
 - There is no cloud fallback, and no paid API is used.
@@ -269,6 +271,10 @@ Limitations of this run:
   8,000-character limit, so the model saw only their start.
 - **The verifier's input differs between modes.** The hybrid verifier only
   sees about 20 changed lines around each finding.
+- **Raw replies were not saved.** The benchmark saved each model call's parsed status and one-sentence reason, not the model's raw reply. The parsed decisions can be recomputed and checked from `eval/results/llm/`; the exact original replies cannot. For
+  example, 4 saved hybrid decisions (all AUTH001 in `novu-11754`) give a
+  reason starting "The flagged change is not actually risky" while the
+  parsed answer was "risky".
 - **The labels' limits apply here too.** The labels have no real security
   positives, and the synthetic cases were written knowing how the rules
   work.
