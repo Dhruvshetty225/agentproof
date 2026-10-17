@@ -246,9 +246,12 @@ How it handles the security-sensitive parts:
   ignore directives on the lines it adds. It can silence those findings and
   still pass `fail-on-reject` (see
   [Ignoring a specific finding](#ignoring-a-specific-finding)).
-  Documenting this does not prevent it. With the current configuration,
-  treat the result as review assistance, and check the ignored findings
-  (SARIF suppressions) in every review.
+  It can also add a `.gitattributes` file that marks source files as
+  binary (for example `*.py -diff`), which hides their lines from the
+  rules. Documenting this does not prevent it. With the current
+  configuration, treat the result as review assistance, and check the
+  ignored findings (SARIF suppressions) and any `.gitattributes` changes in
+  every review.
 
 Account-dependent limits (from GitHub's documentation; check the current
 billing pages before relying on them):
@@ -558,7 +561,9 @@ none of the six patterns was found in the diff's text.
     `aws_secret_access_key` and `private_key`;
   - type-annotated assignments (`password: str = "..."`);
   - Go's `:=`;
-  - Stripe-style `sk_live_...` keys.
+  - Stripe-style `sk_live_...` keys;
+  - `sk-` keys with fewer than four letters or digits before the first
+    hyphen, such as `sk-ant-...`.
 - **Logging safety (LOG001)** ignores words inside static messages
   (`logger.info("Reset token sent")`) and looks at the logged values:
   arguments, f-string/template placeholders and quoted lookup keys. It only
@@ -592,6 +597,12 @@ none of the six patterns was found in the diff's text.
   the change itself and can silence that line's findings, so AgentProof is
   not a tamper-resistant security gate (see
   [Ignoring a specific finding](#ignoring-a-specific-finding)).
+- **`.gitattributes` comes from the checked-out files.** A change that adds
+  `*.py -diff` makes git report its Python files as binary, so AUTH001,
+  SECRET001 and LOG001 never see their lines. Only UNREVIEWABLE001
+  (medium) fires, and in testing such a change, which also deleted an
+  auth check, was approved. Git 2.40's `--attr-source` could read the
+  attributes from the base instead; AgentProof does not use it yet.
 - **Unusual file names.** Git quotes file names that contain non-ASCII or
   special characters (for example `"b/caf\303\251.py"`), and AgentProof
   keeps the quoted form. Such paths are shown wrongly, and TESTCOV001 does

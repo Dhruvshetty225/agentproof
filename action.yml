@@ -16,6 +16,9 @@
 #   `agentproof: ignore[...]` directives on lines the pull request adds come
 #   from the pull request itself, so it can silence findings on those lines
 #   and still pass fail-on-reject. Review the report's ignored findings.
+#   The pull request can also add a .gitattributes file that marks source
+#   files as binary (`*.py -diff`), which hides their lines from the rules.
+#   Review .gitattributes changes too.
 name: AgentProof
 description: Audit the changes in a pull request for risky AI-generated edits using deterministic rules.
 

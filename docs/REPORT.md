@@ -383,12 +383,15 @@ TESTCOV001 9, UNREVIEWABLE001 1). They fall into a few patterns:
 - **Not a tamper-resistant security gate.** An `agentproof: ignore[...]`
   directive on an added line comes from the change being audited. A change
   can use one to silence its own finding, for example a hardcoded secret,
-  and still be approved; this was confirmed in testing. The README
-  documents it, but documenting it does not prevent it.
+  and still be approved; this was confirmed in testing. A change can also
+  add a `.gitattributes` file that marks source files as binary
+  (`*.py -diff`): git then hides their lines from the rules, and a change
+  that deleted an auth check this way was approved in testing. The README
+  documents both, but documenting them does not prevent them.
 - **Detection gaps found in the final review** (listed in the README's
   Known Limitations):
   - SECRET001 misses names such as `aws_secret_access_key`, type-annotated
-    assignments, Go's `:=` and `sk_live_` keys;
+    assignments, Go's `:=`, `sk_live_` keys and `sk-ant-` style keys;
   - AUTH001 counts SQL and HTML comments and words in strings;
   - quoted non-ASCII file names are shown wrongly;
   - mode-only changes are invisible.
