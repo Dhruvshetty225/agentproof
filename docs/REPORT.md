@@ -378,8 +378,12 @@ TESTCOV001 9, UNREVIEWABLE001 1). They fall into a few patterns:
 - **Default configuration only.** Only the default severities and
   thresholds were evaluated.
 - **The LLM results cover one small model,** in one run on one machine.
-- **The GitHub Action has not been run** on GitHub-hosted runners. Its
-  shell steps are tested locally (`tests/test_action.py`).
+- **The GitHub Action has run once** on a GitHub-hosted runner
+  ([run 39000721919](https://github.com/Dhruvshetty225/agentproof/actions/runs/39000721919)),
+  on a test pull request that only added a workflow file, so it reported
+  no findings. A REJECT that fails the job has only been tested locally
+  (`tests/test_action.py`), and pull requests from forks have not been
+  tested.
 - **Not a tamper-resistant security gate.** An `agentproof: ignore[...]`
   directive on an added line comes from the change being audited. A change
   can use one to silence its own finding, for example a hardcoded secret,

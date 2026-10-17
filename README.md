@@ -266,8 +266,12 @@ billing pages before relying on them):
   that step if you don't have them; the artifact upload still works.
 
 Nothing here runs automatically in this repository: the example lives in
-`examples/`, not `.github/workflows/`, and the action has not been run on
-GitHub-hosted runners as part of this work.
+`examples/`, not `.github/workflows/`. The action was run once on a
+GitHub-hosted runner, in test pull request
+[#1](https://github.com/Dhruvshetty225/agentproof/pull/1)
+([run 39000721919](https://github.com/Dhruvshetty225/agentproof/actions/runs/39000721919)):
+it installed AgentProof, audited the pull request (no findings, APPROVE)
+and uploaded the SARIF report as an artifact and to code scanning.
 
 The third-party actions used here were confirmed to exist with a read-only
 `git ls-remote` on 2026-10-17:
@@ -588,9 +592,12 @@ none of the six patterns was found in the diff's text.
 - **SARIF locations for deleted lines** point at the file without a line,
   so code scanning cannot highlight the deleted code itself. If the whole
   file was deleted, the path no longer exists in the pull request's head.
-- **The GitHub Action** has only been checked locally (YAML parsing and
-  running its shell steps against the demo repository). It has not been
-  run on GitHub-hosted runners.
+- **The GitHub Action** has run once on a GitHub-hosted runner
+  ([run 39000721919](https://github.com/Dhruvshetty225/agentproof/actions/runs/39000721919)),
+  on a test pull request that only added a workflow file, so it reported
+  no findings. A REJECT that fails the job has only been tested locally
+  (`tests/test_action.py` runs the action's shell steps), and pull
+  requests from forks have not been tested.
 - **Redaction** can only hide values that SECRET001 recognizes. A secret
   it does not detect is shown as-is. To stay on the safe side, a detected
   value is masked everywhere it appears as a whole word, so a very short
