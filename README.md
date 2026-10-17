@@ -2,8 +2,13 @@
 
 AgentProof is a local-first CLI that audits AI-generated code changes before
 merge. It compares two Git branches, detects risky changes with rule-based
-checks, calculates a merge risk score, and generates terminal and HTML
-reports.
+checks, calculates a merge risk score, and writes a terminal, HTML, JSON or
+SARIF report. An optional local LLM verifier (Ollama) can give a second
+opinion on each finding.
+
+It was evaluated on 78 real pull requests opened by AI coding agents and 20
+synthetic cases; see [Evaluation](#evaluation) and
+[`docs/REPORT.md`](docs/REPORT.md).
 
 ## Why AI-generated code needs auditing
 
@@ -26,19 +31,32 @@ as a regression weeks later, or a leaked credential in git history.
 AgentProof runs a fast, deterministic pass over a diff — before a human
 reviewer even opens it — to catch this class of problem early.
 
+None of these risks is specific to AI-written code: people make the same
+mistakes, and AgentProof works on any branch. In the evaluation's 78
+agent-authored pull requests, the human-reviewed labels found 24 behavior
+changes without tests and 4 unrelated changes, and no removed security
+check, hardcoded secret or logged secret.
+
 ## Installation
+
+Everything runs locally, and every dependency is free and open source.
+AgentProof needs Python 3.9 or later and git.
 
 ```bash
 git clone <this-repo>
 cd agentproof
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
 pip install -e .
 ```
 
 This installs the `agentproof` command via the `agentproof` console-script
-entry point defined in `pyproject.toml`.
+entry point defined in `pyproject.toml`. The runtime dependencies are
+typer, GitPython, Jinja2 and rich. `pip install -r requirements.txt` also
+installs:
+
+- pytest and jsonschema, for the tests;
+- matplotlib, for the evaluation charts.
 
 ## Running the demo
 
@@ -299,6 +317,89 @@ lines indented deeper than it (its body or continuation lines). A line at
 the same or shallower indentation starts a new statement, so two adjacent
 but independent checks are still reported and scored separately.
 
+## Optional local LLM verifier
+
+`--llm-verify` asks a local Ollama model whether each finding is actually
+risky. It is off by default.
+
+- **When a finding is removed.** Only when the model clearly answers "no".
+  The model can never add findings.
+- **When the model is not asked.** Critical findings, and text that seems to
+  address an AI model, are always kept.
+- **Failures.** On a timeout, a malformed reply or Ollama not running, the
+  finding is kept and the report says so.
+- **Local only.** Only a server on this machine is accepted; there is no
+  cloud fallback.
+
+Setup, from [`docs/LLM_VERIFIER.md`](docs/LLM_VERIFIER.md). Ollama is free
+(MIT license); a model download is 1–5 GB.
+
+```bash
+brew install ollama
+ollama serve                       # in its own terminal
+ollama pull qwen2.5-coder:1.5b     # 986 MB; the default qwen2.5-coder:7b is 4.7 GB
+agentproof audit --repo . --branch feature --task "..." --llm-verify --llm-model qwen2.5-coder:1.5b
+```
+
+**Measured effect: none so far.** With `qwen2.5-coder:1.5b`, the verifier
+suppressed no findings, so its results equal the rules'. The 7B model froze
+the 8 GB test machine during its full run. See
+[Evaluation](#evaluation).
+
+## Evaluation
+
+The evaluation dataset, labels and code are in [`eval/`](eval/README.md).
+The full write-up is [`docs/REPORT.md`](docs/REPORT.md). Every number below
+comes from these commands:
+
+```bash
+python -m eval.summarize_dataset                       # dataset and label counts
+GITHUB_TOKEN=... python -m eval.collect --from-manifest eval/manifest.csv   # re-download the real diffs
+python -m eval.run_eval                                # original vs improved rules -> eval/results/
+python -m eval.run_llm_eval --model qwen2.5-coder:1.5b # rules vs LLM only vs hybrid -> eval/results/llm/
+```
+
+**Dataset:**
+
+- 78 merged pull requests opened by five AI coding agents in 66 public
+  repositories;
+- 20 hand-written synthetic cases;
+- every label reviewed by a human.
+
+**Results per case**, measured as "any finding" against the human label
+(precision / recall / F1). These come from `eval/results/comparison.md` and
+`eval/results/llm/comparison.md`.
+
+| Cases | Original rules | Improved rules |
+|---|---|---|
+| Real, all 78 | 0.51 / 0.89 / 0.65 | 0.60 / 0.93 / 0.72 |
+| Real, held-out 40 (never used for tuning) | 0.44 / 0.85 / 0.58 | 0.52 / 0.85 / 0.65 |
+| Synthetic 20 | 0.75 / 0.82 / 0.78 | 1.00 / 1.00 / 1.00 |
+
+What changed with the improved rules:
+
+- **TESTCOV001** false positives on real cases fell from 20 to 9.
+- **AUTH001 and SECRET001** false positives rose from 6 to 9 and from 2 to 3.
+- **Real security positives:** there are none, so security recall was
+  measured only on the synthetic cases, where it went from 0.43 to 1.00.
+- **Scoring:** the default scoring reached "review" or "reject" on only 2 of
+  the 27 risky real cases (recall 0.07).
+
+LLM comparison, on the 96 cases where every mode produced a result
+(`qwen2.5-coder:1.5b`):
+
+| Mode | Real, all 76 | Synthetic 20 | Time per real case |
+|---|---|---|---|
+| Rules only | 0.61 / 0.93 / 0.74 | 1.00 / 1.00 / 1.00 | 0.00 s |
+| LLM only | 0.36 / 1.00 / 0.52 | 0.55 / 1.00 / 0.71 | 4.82 s |
+| Hybrid (rules + verifier) | 0.61 / 0.93 / 0.74 | 1.00 / 1.00 / 1.00 | 2.28 s |
+
+Two of these results are not what they look like:
+
+- **LLM only reported a risk on every case,** so its recall of 1.00 is not
+  good detection.
+- **The hybrid's model answered "risky" every time,** so it removed nothing.
+
 ## Project architecture
 
 ```
@@ -309,13 +410,15 @@ agentproof/
   schema.py    Finding / AuditReport dataclasses, Severity and
                MergeRecommendation enums
   engine.py    Runs all rules, deduplicates findings, applies ignores,
-               grouping and config, scores risk, and produces the
-               final AuditReport
+               grouping, config and the optional LLM verifier, scores
+               risk, and produces the final AuditReport
   config.py    Loads and validates the optional .agentproof.toml
   ignores.py   Inline "agentproof: ignore[RULE_ID]" directives
   grouping.py  Merges findings from one deleted block
   redaction.py Masks secrets before any report is displayed or written
-  report.py    Renders an AuditReport to HTML via Jinja2
+  report.py    Renders an AuditReport to HTML (Jinja2) or JSON
+  sarif.py     Renders an AuditReport as SARIF 2.1.0
+  llm_verify.py  Optional local Ollama verifier (--llm-verify)
   identifiers.py  Splits snake_case/camelCase names into words so rules
                   match whole words instead of raw substrings
   rules/
@@ -332,8 +435,12 @@ agentproof/
                  module so it ships correctly in a built wheel, not just
                  in an editable install)
 demo-app/      Fixture repo with a safe `main` and a flawed `ai-fix` branch
-tests/         pytest suite covering the diff parser, each rule, and the
-               end-to-end engine/CLI behavior
+eval/          Evaluation dataset (manifest, labels, synthetic cases),
+               collector, metrics and runners; results in eval/results/
+docs/          REPORT.md (evaluation), LLM_VERIFIER.md, BASELINE.md
+tests/         pytest suite covering the diff parser, each rule, the
+               end-to-end engine/CLI behavior, the outputs and the evaluation
+               code
 ```
 
 **Risk scoring** (`agentproof/engine.py`): critical = 30, high = 20,
@@ -345,14 +452,34 @@ the thresholds can be changed in `.agentproof.toml`.
 
 - Support additional languages beyond Python (JS/TS, Go) in the rule set.
 - Post the report as a pull request comment from the GitHub Action.
-- Richer `unrelated_changes` scoping using commit message / PR description
-  instead of a single `--task` string.
+- **Reduce the false positives found in the evaluation,** tuning on the
+  development split only:
+  - skip lockfiles and documentation in AUTH001;
+  - handle fake values in test files in SECRET001;
+  - require more than one shared word in SCOPE001;
+  - recognize `.vue` and similar files in TESTCOV001.
+- Revisit the default severities and thresholds, which rarely reach
+  "review" on their own.
+- Measure a larger local model on a machine with more memory.
 
 ## Known Limitations
 
 AgentProof is a local-first, rule-based auditor — it's designed to catch
 common patterns of risky AI-generated changes, not to replace human code
-review.
+review. **A clean audit does not prove a change is safe.** It only means
+none of the six patterns was found in the diff's text.
+
+- **Measured on real pull requests** (see [Evaluation](#evaluation)):
+  - the security rules raised false alarms on lockfiles, documentation,
+    data and fake test values;
+  - SCOPE001 found 1 of 4 real scope problems;
+  - the default score reached "review" for only 2 of 27 risky real cases.
+
+  The evaluation has no real security positives, so how many real
+  security problems the rules catch is unknown.
+- **The optional LLM verifier** can only remove findings, never add any.
+  With the small model it was tested with, it removed none. Its
+  prompt-injection check is a simple heuristic.
 
 - **`unrelated_changes` (SCOPE001)** uses keyword matching against the task
   description, not semantic understanding. It can still miss genuinely
@@ -394,7 +521,8 @@ review.
   `*Test.java`, `*_test.go`, ...). It does not measure coverage. Any
   changed test file suppresses the warning, even an unrelated test or a
   test file that was deleted. `*.test.jsx`/`*.test.tsx` names are not
-  recognized.
+  recognized, and `.vue` files are not treated as source code. Tests written
+  inside a source file (Rust `#[cfg(test)]`) are not seen.
 - **SARIF locations for deleted lines** point at the file without a line,
   so code scanning cannot highlight the deleted code itself. If the whole
   file was deleted, the path no longer exists in the pull request's head.
@@ -417,6 +545,14 @@ bash scripts/setup_demo_app.sh     # builds the demo-app fixture
 bash scripts/fetch_sarif_schema.sh # downloads the SARIF 2.1.0 schema (pinned, checksum-verified)
 pytest -v
 ```
+
+Some tests are skipped unless their prerequisites are met:
+
+- The LLM tests use a fake model and a fake Ollama server.
+- One optional test talks to a real local Ollama. It is skipped unless
+  `AGENTPROOF_OLLAMA_SMOKE=1` is set.
+- The tests never need the real pull-request diffs; only `python -m
+  eval.run_eval` and `python -m eval.run_llm_eval` read `eval/data/real/`.
 
 The SARIF schema is published by OASIS under its IPR policy rather than an
 open-source license, so it is downloaded instead of committed. Without it,
@@ -444,6 +580,7 @@ value. Several real bugs surfaced during that process:
 
 All four were caught by running the tool against a real, unrelated repo
 instead of just the bundled demo, and all are now fixed and covered by
-regression tests (42/42 passing). The takeaway: a tool is only as
+regression tests (42/42 passing at the time; the suite has since grown,
+see "Running the tests"). The takeaway: a tool is only as
 trustworthy as the testing behind it, which is why AgentProof's own code
 gets the same scrutiny it applies to yours.

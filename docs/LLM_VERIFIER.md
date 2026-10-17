@@ -103,9 +103,11 @@ Download sizes and licenses are as listed on ollama.com on 2026-10-16. The
 
 - A 5-case check finished (`eval/results/llm-smoke/`; 5 development cases,
   so too few for any accuracy claim).
-- The full run froze the Mac twice. Swap use reached about 7.6 GB, and the
-  Mac had to be force-restarted with the power button during case 13 of 98.
-  The Ollama log shows no error before the freeze.
+- While 7B was loaded, swap use reached about 7.6 GB of 8 GB.
+- During the full run the Mac froze at case 13 of 98 and had to be
+  force-restarted with the power button. The Ollama log shows no error
+  before the freeze. (An earlier restart that evening was deliberate, not a
+  freeze.)
 - The full benchmark therefore uses `qwen2.5-coder:1.5b` instead, reported
   as a fallback to a weaker model.
 
