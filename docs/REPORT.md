@@ -392,8 +392,10 @@ TESTCOV001 9, UNREVIEWABLE001 1). They fall into a few patterns:
   - AUTH001 counts SQL and HTML comments and words in strings;
   - quoted non-ASCII file names are shown wrongly;
   - mode-only changes are invisible.
-- **Python versions.** Only Python 3.12 was tested. The project declares
-  3.9 or later.
+- **Python versions.** The test suite passed on Python 3.10, 3.11 and
+  3.12 in the GitHub Tests workflow at commit `36eb6b2`
+  ([run 38996141338](https://github.com/Dhruvshetty225/agentproof/actions/runs/38996141338)), and on 3.12 locally. The project
+  declares 3.9 or later; 3.9 was not tested.
 - **Raw model replies were not saved,** so the exact LLM replies cannot be
   checked; the parsed decisions can.
 

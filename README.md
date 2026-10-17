@@ -41,11 +41,12 @@ check, hardcoded secret or logged secret.
 
 Everything runs locally, and every dependency is free and open source.
 AgentProof needs git and Python. `pyproject.toml` declares Python 3.9 or
-later, but that is a stated compatibility, not a tested one:
+later, but only some of those versions were actually tested:
 
-- **Tested:** the full test suite on Python 3.12 (macOS).
-- **Configured but not run for this work:** the CI workflow
-  (`.github/workflows/tests.yml`) tests 3.10, 3.11 and 3.12.
+- **Tested on GitHub:** the Tests workflow (`.github/workflows/tests.yml`)
+  passed on Python 3.10, 3.11 and 3.12 (Ubuntu) at commit `36eb6b2`:
+  [run 38996141338](https://github.com/Dhruvshetty225/agentproof/actions/runs/38996141338).
+- **Tested locally:** the full test suite on Python 3.12 (macOS).
 - **Not tested:** 3.9. Every source file passes a 3.9 syntax check, nothing
   more.
 
@@ -597,7 +598,8 @@ none of the six patterns was found in the diff's text.
   not treat them as source files.
 - **Mode-only changes** (for example making a file executable) change no
   lines, so no rule sees them.
-- **Python versions:** only 3.12 was tested (see Installation).
+- **Python versions:** tested on 3.10, 3.11 and 3.12. 3.9 is declared in
+  `pyproject.toml` but untested (see Installation).
 
 ## Running the tests
 
