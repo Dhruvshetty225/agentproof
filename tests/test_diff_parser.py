@@ -39,6 +39,32 @@ index 06944d8..1a299e5 100644
 """
 
 
+# Inside a hunk, lines like "--- x" and "+++ y" are content, not file headers.
+DASH_CONTENT_DIFF = """\
+diff --git a/schema.sql b/schema.sql
+index 1111111..2222222 100644
+--- a/schema.sql
++++ b/schema.sql
+@@ -3,2 +3,0 @@
+--- legacy users table
+-DROP TABLE users;
+diff --git a/config.yml b/config.yml
+index 3333333..4444444 100644
+--- a/config.yml
++++ b/config.yml
+@@ -1 +0,0 @@
+----
+@@ -5,0 +5 @@
++++ added marker
+diff --git a/loop.c b/loop.c
+index 5555555..6666666 100644
+--- a/loop.c
++++ b/loop.c
+@@ -10,0 +11 @@
++++i;
+"""
+
+
 def test_parse_diff_returns_both_changed_files():
     file_diffs = parse_diff(DEMO_APP, "main", "ai-fix")
     paths = {f.file_path for f in file_diffs}
@@ -110,3 +136,24 @@ def test_rename_with_content_change_still_parses_deleted_lines():
     assert file_diff.is_pure_rename is False
     assert len(file_diff.deleted_lines) == 3
     assert "is_expired" in file_diff.deleted_lines[0].content
+
+
+def test_lines_starting_with_dashes_or_pluses_inside_a_hunk_are_content():
+    sql, yml, c_file = _parse_unified_diff(DASH_CONTENT_DIFF)
+
+    assert sql.file_path == "schema.sql"
+    assert [(l.line_number, l.content) for l in sql.deleted_lines] == [
+        (3, "-- legacy users table"),
+        (4, "DROP TABLE users;"),
+    ]
+    assert yml.file_path == "config.yml"
+    assert [(l.line_number, l.content) for l in yml.deleted_lines] == [(1, "---")]
+    assert [(l.line_number, l.content) for l in yml.added_lines] == [(5, "++ added marker")]
+    assert c_file.file_path == "loop.c"
+    assert [(l.line_number, l.content) for l in c_file.added_lines] == [(11, "++i;")]
+
+
+def test_file_headers_are_still_read_before_the_first_hunk():
+    sql, yml, c_file = _parse_unified_diff(DASH_CONTENT_DIFF)
+    assert [sql.file_path, yml.file_path, c_file.file_path] == ["schema.sql", "config.yml", "loop.c"]
+    assert sql.added_lines == [] and c_file.deleted_lines == []

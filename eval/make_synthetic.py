@@ -23,7 +23,9 @@ import json
 import shutil
 import subprocess
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Iterator
 
 OUT_DIR = Path(__file__).resolve().parent / "synthetic"
 _GIT = ["git", "-c", "user.name=AgentProof Synthetic", "-c", "user.email=synthetic@example.com",
@@ -546,8 +548,10 @@ def _write_files(repo: Path, files: dict) -> None:
                 handle.write(content)
 
 
-def make_diff(case: dict) -> str:
-    """Commit the case's before/after files and return git's diff between them."""
+@contextmanager
+def built_repo(case: dict) -> Iterator[Path]:
+    """A temporary git repo with the case's before files on main and its
+    after files on a feature branch."""
     with tempfile.TemporaryDirectory() as tmp:
         repo = Path(tmp)
         _git(repo, "init", "-q", "-b", "main")
@@ -561,7 +565,17 @@ def make_diff(case: dict) -> str:
         _write_files(repo, case["after"])
         _git(repo, "add", "-A")
         _git(repo, "commit", "-q", "-m", "after")
-        return _git(repo, "diff", "--no-color", "-M", "main...feature")
+        yield repo
+
+
+def make_diff(case: dict, *diff_options: str) -> str:
+    """Return git's diff between the case's before and after files.
+
+    Extra ``diff_options`` (for example ``"-U0"``) are only used by tests;
+    pr.diff is generated without any.
+    """
+    with built_repo(case) as repo:
+        return _git(repo, "diff", "--no-color", "-M", *diff_options, "main...feature")
 
 
 def main() -> None:

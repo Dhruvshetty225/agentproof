@@ -100,6 +100,10 @@ def _parse_unified_diff(diff_text: str) -> list[FileDiff]:
     minus_path = ""
     plus_path = ""
     rename_from: str | None = None
+    # File headers ("--- a/x", "+++ b/x", "rename ...") only appear before a
+    # file's first hunk. Inside a hunk, "--- x" is a deleted line whose
+    # content starts with "-- " (an SQL comment, a YAML "---" separator...).
+    in_hunk = False
 
     for line in diff_text.splitlines():
         if line.startswith("diff --git"):
@@ -109,33 +113,36 @@ def _parse_unified_diff(diff_text: str) -> list[FileDiff]:
             minus_path = ""
             plus_path = ""
             rename_from = None
-        elif line.startswith("rename from "):
-            rename_from = line[len("rename from ") :].strip()
-        elif line.startswith("rename to "):
-            rename_to = line[len("rename to ") :].strip()
-            current = FileDiff(file_path=rename_to, is_rename=True, old_path=rename_from)
-        elif line.startswith("Binary files ") and line.endswith(" differ"):
-            match = _BINARY_HEADER_RE.match(line)
-            if match and current is None:
-                current = FileDiff(
-                    file_path=_file_path_from_header(match.group(1), match.group(2)),
-                    is_binary=True,
-                )
-        elif line.startswith("--- "):
-            minus_path = line[4:].strip()
-        elif line.startswith("+++ "):
-            plus_path = line[4:].strip()
-            if current is None:
-                current = FileDiff(file_path=_file_path_from_header(minus_path, plus_path))
+            in_hunk = False
         elif line.startswith("@@"):
             match = _HUNK_HEADER_RE.match(line)
             if match:
+                in_hunk = True
                 old_line = int(match.group(1))
                 new_line = int(match.group(2))
-        elif current is not None and line.startswith("-") and not line.startswith("---"):
+        elif not in_hunk:
+            if line.startswith("rename from "):
+                rename_from = line[len("rename from ") :].strip()
+            elif line.startswith("rename to "):
+                rename_to = line[len("rename to ") :].strip()
+                current = FileDiff(file_path=rename_to, is_rename=True, old_path=rename_from)
+            elif line.startswith("Binary files ") and line.endswith(" differ"):
+                match = _BINARY_HEADER_RE.match(line)
+                if match and current is None:
+                    current = FileDiff(
+                        file_path=_file_path_from_header(match.group(1), match.group(2)),
+                        is_binary=True,
+                    )
+            elif line.startswith("--- "):
+                minus_path = line[4:].strip()
+            elif line.startswith("+++ "):
+                plus_path = line[4:].strip()
+                if current is None:
+                    current = FileDiff(file_path=_file_path_from_header(minus_path, plus_path))
+        elif current is not None and line.startswith("-"):
             current.deleted_lines.append(ChangedLine(line_number=old_line, content=line[1:]))
             old_line += 1
-        elif current is not None and line.startswith("+") and not line.startswith("+++"):
+        elif current is not None and line.startswith("+"):
             current.added_lines.append(ChangedLine(line_number=new_line, content=line[1:]))
             new_line += 1
 

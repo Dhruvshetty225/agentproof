@@ -29,6 +29,12 @@ That command only reads committed files (`manifest.csv`,
 | `make_synthetic.py`, `synthetic/` | The 20 synthetic cases and the script that generates them | yes |
 | `labels.csv` | Reviewed labels (each row `confirmed` or `corrected`) | yes |
 | `LABELING_GUIDE.md` | Definition of "risky" for each rule | yes |
+| `split.py`, `split.csv` | Fixed development / held-out split, made before any result | yes |
+| `u0.py` | Converts the context diffs to git's `-U0` form that AgentProof parses | yes |
+| `metrics.py` | Precision, recall, F1 and counts per rule and per case | yes |
+| `run_rules.py` | Adapter that runs one AgentProof version on the prepared diffs | yes |
+| `run_eval.py` | Runs the original and improved versions and writes `results/` | yes |
+| `results/` | Metrics, predictions, comparison table, charts, environment | yes |
 | `data/real/<case_id>/` | `metadata.json` (incl. PR description) and `pr.diff` for each real case | **no** (see below) |
 
 The real diffs and PR descriptions are third-party content under many

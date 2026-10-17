@@ -5,3 +5,4 @@ rich>=13.0.0
 tomli>=1.1.0; python_version < "3.11"
 pytest>=8.0.0
 jsonschema>=4.18.0  # tests only: validates generated SARIF
+matplotlib>=3.8  # evaluation only: charts written by eval/run_eval.py
